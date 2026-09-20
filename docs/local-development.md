@@ -56,6 +56,39 @@ chmod +x ~/.docker/cli-plugins/docker-compose
 On WSL with Docker Desktop, enable integration for this distribution in
 *Docker Desktop → Settings → Resources → WSL Integration* instead.
 
+## Authenticating locally
+
+`make up` starts Keycloak with the `opsflow` realm imported from
+`deploy/keycloak/realm-opsflow.json`. The admin console is at `http://localhost:8081`
+(admin/admin).
+
+Four users exist, all with password `password`:
+
+| User | Realm roles | Use for |
+|---|---|---|
+| `reporter` | `USER` | The ordinary case |
+| `reviewer` | `USER`, `REVIEWER` | Review authority |
+| `admin` | `USER`, `ADMIN` | Platform administration |
+| `noroles` | *(none)* | Proving that authorization fails closed |
+
+To get a token with curl:
+
+```bash
+TOKEN=$(curl -s -X POST \
+  "http://localhost:8081/realms/opsflow/protocol/openid-connect/token" \
+  -d client_id=opsflow-dev-cli -d grant_type=password \
+  -d username=reporter -d password=password | jq -r .access_token)
+
+curl -s -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/v1/me | jq
+```
+
+**The realm ships two development-only clients.** `opsflow-dev-cli` enables the password grant so
+a token can be obtained without a browser, and `opsflow-wrong-audience-cli` issues tokens without
+this API's audience so an integration test can prove they are rejected. Neither belongs in a
+deployed realm. `opsflow-frontend` — the client the Angular application uses — is configured
+exactly as it would be deployed: Authorization Code with PKCE, no password grant, exact redirect
+URIs.
+
 ## Daily loop
 
 ```bash

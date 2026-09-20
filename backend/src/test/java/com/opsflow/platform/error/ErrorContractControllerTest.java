@@ -14,19 +14,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.opsflow.platform.config.ClockConfig;
 import com.opsflow.platform.correlation.CorrelationIdFilter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Clock;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,18 +38,20 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>Driven through a test-only controller rather than a real endpoint, so the contract is
  * pinned down before any feature depends on it and the test does not break when features change.
  */
-@WebMvcTest(controllers = ErrorContractControllerTest.TestController.class)
-@Import({
-    GlobalExceptionHandler.class,
-    ProblemDetailFactory.class,
-    ClockConfig.class,
-    CorrelationIdFilter.class,
-    ErrorContractControllerTest.TestController.class
-})
 class ErrorContractControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        // No application context: this verifies exception-to-HTTP mapping, which needs a
+        // controller, the advice and the correlation filter, and nothing else. Standalone
+        // setup keeps it fast and stops unrelated configuration from breaking it.
+        mockMvc = MockMvcBuilders.standaloneSetup(new TestController())
+                .setControllerAdvice(new GlobalExceptionHandler(new ProblemDetailFactory(Clock.systemUTC())))
+                .addFilters(new CorrelationIdFilter())
+                .build();
+    }
 
     @Test
     void notFoundProducesProblemJsonWithAStableCode() throws Exception {
@@ -167,7 +167,6 @@ class ErrorContractControllerTest {
                 .andExpect(jsonPath("$.correlationId").value(notNullValue()));
     }
 
-    @TestConfiguration
     @RestController
     static class TestController {
 
