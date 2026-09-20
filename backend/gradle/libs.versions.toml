@@ -10,6 +10,10 @@
 springBoot = "4.1.1"
 springDependencyManagement = "1.1.7"
 
+# --- API documentation ----------------------------------------------------
+# springdoc majors track Spring Boot majors; the 3.x line is the Boot 4 line.
+springdoc = "3.1.1"
+
 # --- Build plugins --------------------------------------------------------
 spotless = "7.0.4"
 palantirJavaFormat = "2.68.0"
@@ -24,7 +28,13 @@ palantirJavaFormat = "2.68.0"
 # directly give identical coverage with no compatibility exposure.
 archunit = "1.4.1"
 
+# Spring Boot 4's BOM does not manage Testcontainers coordinates, so its own BOM
+# is imported explicitly to keep every module on one version.
+testcontainers = "2.0.5"
+
 [libraries]
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
 
 [plugins]

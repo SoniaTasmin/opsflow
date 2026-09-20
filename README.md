@@ -6,8 +6,9 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M0 of 10 complete.** Repository, toolchain and CI are in place. The application
-> itself starts at M1. See [the roadmap](#roadmap) for exactly what does and does not exist.
+> **Status: M1 of 10 complete.** Repository, toolchain, CI and the platform foundations
+> (error contract, correlation IDs, structured logging, Flyway, Testcontainers) are in place.
+> Business capabilities start at M2. See [the roadmap](#roadmap) for what does and does not exist.
 
 ## Why this project is interesting
 
@@ -21,6 +22,9 @@ Once there is something to look at, these are the parts worth reading:
 - **Concurrency handled in the database** — a unique constraint on (organization, period), a GiST
   exclusion constraint against overlapping periods, and a partial unique index serializing
   concurrent imports.
+- **One error contract, enforced.** Every failure is RFC 9457 `application/problem+json` with a
+  stable machine-readable `code` and the request's correlation ID — including 500s, which leak
+  nothing else. See [ADR-0010](docs/adr/0010-error-contract.md).
 - **Honest limitations.** The [limitations](#limitations) section below is part of the design,
   not an apology for it.
 
@@ -64,7 +68,7 @@ back-edge.
 | Milestone | Scope | Status |
 |---|---|---|
 | M0 | Repository, toolchain, CI | ✅ Complete |
-| M1 | Platform foundations: error contract, correlation IDs, Flyway, Testcontainers | Not started |
+| M1 | Platform foundations: error contract, correlation IDs, Flyway, Testcontainers | ✅ Complete |
 | M2 | Security and identity: Keycloak, OIDC resource server, user provisioning | Not started |
 | M3 | Organizations and membership | Not started |
 | M4 | Metric catalogue and reporting periods | Not started |

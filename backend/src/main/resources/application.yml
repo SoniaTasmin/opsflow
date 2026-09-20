@@ -2,39 +2,92 @@
 # and, in deployed environments, in environment variables only.
 #
 # No secret ever has a default here: a missing one must fail startup rather than
-# fall back to a placeholder. That is enforced by @Validated @ConfigurationProperties
-# as configuration is introduced, not by this file.
+# fall back to a placeholder.
 spring:
   application:
     name: opsflow
+
+  datasource:
+    url: ${OPSFLOW_DB_URL:jdbc:postgresql://localhost:5432/opsflow}
+    username: ${OPSFLOW_DB_USER:opsflow}
+    password: ${OPSFLOW_DB_PASSWORD:}
+    hikari:
+      pool-name: opsflow-pool
+      maximum-pool-size: 10
+
+  flyway:
+    enabled: true
+    schemas: opsflow
+    default-schema: opsflow
+    # A migration is immutable once merged. Validation catches an edited file,
+    # and out-of-order application would let two branches apply in either order.
+    validate-on-migrate: true
+    out-of-order: false
+    # `clean` drops everything in the schema. It is disabled in every profile,
+    # including local: pointing it at the wrong URL is how people lose data.
+    clean-disabled: true
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Hibernate never creates or alters a table; Flyway owns the schema.
+      # A mismatch between entities and migrations fails startup, which is the
+      # single cheapest way to catch schema drift.
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: opsflow
+
+  # Structured logs as JSON, using Spring Boot's built-in support. MDC entries —
+  # including correlationId — are emitted as fields, so logs are queryable
+  # without a log-parsing regex. Overridden to plain text for local development.
+  threads:
+    virtual:
+      # Off until measured: virtual threads can pin on synchronized blocks and
+      # interact badly with a fixed JDBC pool. Enabling them is a decision to
+      # make with evidence.
+      enabled: false
+
+logging:
+  structured:
+    format:
+      console: ecs
 
 server:
   port: 8080
   error:
     # A stack trace or exception message must never cross the wire, in any
-    # profile. From M1 the RFC 9457 problem detail carries a correlation ID instead.
+    # profile. The problem detail carries a correlation id instead.
     include-stacktrace: never
     include-message: never
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
 
 management:
   endpoints:
     web:
       exposure:
-        # health and info only for now; prometheus is added with the metrics
-        # work in hardening. env, heapdump, threaddump and loggers stay closed.
+        # health and info only. env, heapdump, threaddump and loggers stay closed.
         include: health,info
   endpoint:
     health:
       probes:
         enabled: true
       group:
-        # Liveness must never depend on an external system: if it did, a
-        # database blip would restart every pod and turn a short outage into a
-        # cascading one. Readiness gains its database check in M1.
+        # Liveness must never depend on an external system: if it did, a database
+        # blip would restart every pod and turn a short outage into a cascading one.
         liveness:
           include: livenessState
+        # Readiness does include the database, because an instance that cannot
+        # reach PostgreSQL cannot do useful work.
         readiness:
-          include: readinessState
+          include: readinessState,db
   info:
     env:
       enabled: false

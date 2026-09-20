@@ -1,10 +1,15 @@
 # Local development against the Docker Compose stack (`make up`).
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: validate
+  datasource:
+    url: jdbc:postgresql://localhost:5432/opsflow
+    username: opsflow
+    password: change-me-locally
 
 logging:
+  # Plain text locally: JSON is for log aggregation, not for reading in a terminal.
+  structured:
+    format:
+      console: ""
   level:
     root: INFO
     com.opsflow: DEBUG

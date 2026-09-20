@@ -1,0 +1,21 @@
+# Datasource properties are supplied by @ServiceConnection from the Testcontainers
+# PostgreSQL instance, so none are declared here.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    schemas: opsflow
+    default-schema: opsflow
+    clean-disabled: true
+
+logging:
+  # Plain text: JSON in test output is unreadable when a test fails.
+  structured:
+    format:
+      console: ""
+  level:
+    root: WARN
+    com.opsflow: INFO
+    org.flywaydb: INFO
