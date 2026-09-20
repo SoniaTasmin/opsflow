@@ -1,0 +1,16 @@
+# Local development against the Docker Compose stack (`make up`).
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    root: INFO
+    com.opsflow: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

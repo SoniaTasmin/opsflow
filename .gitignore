@@ -1,0 +1,38 @@
+# --- Java / Gradle ---
+backend/build/
+backend/.gradle/
+backend/bin/
+*.class
+*.jar
+!backend/gradle/wrapper/gradle-wrapper.jar
+
+# --- Node / Angular ---
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+npm-debug.log*
+
+# --- Secrets / local config ---
+.env
+.env.local
+*.pem
+*.key
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+frontend/.vscode/
+.project
+.classpath
+.settings/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Local data ---
+data/
+import-files/

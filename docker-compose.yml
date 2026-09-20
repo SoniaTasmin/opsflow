@@ -1,0 +1,38 @@
+# OpsFlow local development stack.
+#
+#   docker compose up -d                 infrastructure only (the daily loop:
+#                                        backend and frontend run from the IDE)
+#   docker compose --profile app up -d   the whole application stack (from M9)
+#
+# Keycloak joins this file at M2, the backend and frontend images at M9.
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: opsflow-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-opsflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-locally}
+      POSTGRES_DB: ${POSTGRES_DB:-opsflow}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # PostgreSQL 18+ expects a single mount at /var/lib/postgresql, not at
+      # .../data: the image places the cluster in a version-named subdirectory
+      # so that pg_upgrade --link works across a major-version bump.
+      - postgres-data:/var/lib/postgresql
+      # Creates the secondary keycloak database. Runs only on first
+      # initialisation of an empty data volume.
+      - ./deploy/postgres/init-databases.sh:/docker-entrypoint-initdb.d/10-init-databases.sh:ro
+    healthcheck:
+      # Depending services wait on this, not on the container merely starting:
+      # Postgres accepts TCP connections before it is ready to serve queries.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opsflow} -d ${POSTGRES_DB:-opsflow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

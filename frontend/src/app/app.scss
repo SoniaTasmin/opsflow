@@ -1,0 +1,16 @@
+.shell {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  &__header {
+    border-bottom: 1px solid #d8dde3;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__tagline {
+    margin: 0.25rem 0 0;
+    color: #5a6673;
+  }
+}
