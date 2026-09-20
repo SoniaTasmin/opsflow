@@ -1,0 +1,49 @@
+/* OpsFlow — licensed under the MIT License. See LICENSE in the repository root. */
+package com.opsflow.platform.security;
+
+import com.opsflow.platform.error.ErrorCode;
+import com.opsflow.platform.error.ProblemDetailFactory;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import tools.jackson.databind.ObjectMapper;
+
+/**
+ * Returns 403 as a problem detail.
+ *
+ * <p>Used when the caller is authenticated but lacks the required role. Resource-level denials
+ * where the caller cannot even see the owning organization return 404 instead, so that a response
+ * never confirms the existence of something invisible to them.
+ */
+class ProblemAccessDeniedHandler implements AccessDeniedHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ProblemAccessDeniedHandler.class);
+
+    private final ProblemDetailFactory problems;
+    private final ObjectMapper objectMapper;
+
+    ProblemAccessDeniedHandler(ProblemDetailFactory problems, ObjectMapper objectMapper) {
+        this.problems = problems;
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException ex)
+            throws IOException {
+        log.info("Denied authorized request: path={}", request.getRequestURI());
+
+        ProblemDetail problem =
+                problems.create(ErrorCode.ACCESS_DENIED, "You do not have permission to perform this action");
+        problem.setInstance(java.net.URI.create(request.getRequestURI()));
+
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        objectMapper.writeValue(response.getOutputStream(), problem);
+    }
+}

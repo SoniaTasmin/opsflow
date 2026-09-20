@@ -6,9 +6,9 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M1 of 10 complete.** Repository, toolchain, CI and the platform foundations
-> (error contract, correlation IDs, structured logging, Flyway, Testcontainers) are in place.
-> Business capabilities start at M2. See [the roadmap](#roadmap) for what does and does not exist.
+> **Status: M2 of 10 complete.** Toolchain, CI, platform foundations and authentication are in
+> place: you can log in against Keycloak and call a protected endpoint. Organizations start at
+> M3. See [the roadmap](#roadmap) for what does and does not exist.
 
 ## Why this project is interesting
 
@@ -22,6 +22,10 @@ Once there is something to look at, these are the parts worth reading:
 - **Concurrency handled in the database** — a unique constraint on (organization, period), a GiST
   exclusion constraint against overlapping periods, and a partial unique index serializing
   concurrent imports.
+- **One role system, and identity we own.** Keycloak owns global roles and they are never
+  persisted; the database owns organization scope. The application mints its own `UserId` rather
+  than using the OIDC `sub` as a primary key, so the identity provider is an integration and not
+  the owner of every foreign key. See [ADR-0003](docs/adr/0003-identity-and-authorization.md).
 - **One error contract, enforced.** Every failure is RFC 9457 `application/problem+json` with a
   stable machine-readable `code` and the request's correlation ID — including 500s, which leak
   nothing else. See [ADR-0010](docs/adr/0010-error-contract.md).
@@ -41,6 +45,11 @@ make build         # build both projects
 ```
 
 `make help` lists every target.
+
+Once the stack is up, Keycloak is at `http://localhost:8081` (admin/admin) with the `opsflow`
+realm imported. The local realm ships four users — `reporter`, `reviewer`, `admin` and
+`noroles`, all with password `password` — so every role combination, including none at all, can
+be exercised immediately.
 
 Backend and frontend run from your IDE against the Compose infrastructure — that is the intended
 daily loop. A full containerized demo stack with seed data arrives at M9 (`make demo`).
@@ -69,7 +78,7 @@ back-edge.
 |---|---|---|
 | M0 | Repository, toolchain, CI | ✅ Complete |
 | M1 | Platform foundations: error contract, correlation IDs, Flyway, Testcontainers | ✅ Complete |
-| M2 | Security and identity: Keycloak, OIDC resource server, user provisioning | Not started |
+| M2 | Security and identity: Keycloak, OIDC resource server, user provisioning | ✅ Complete |
 | M3 | Organizations and membership | Not started |
 | M4 | Metric catalogue and reporting periods | Not started |
 | M5 | Angular shell, authentication, admin screens | Not started |

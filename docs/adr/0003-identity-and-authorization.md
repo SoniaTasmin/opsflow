@@ -25,7 +25,12 @@ Roles are read from the token on every request and **never persisted**. `app_use
 
 **The database owns scope.** `org_membership` associates a user with organizations and carries no role.
 
-**Application-owned user identity.** `app_user.id` is an application-generated UUIDv7. The external identity is an attribute: `UNIQUE (oidc_issuer, oidc_subject)`, both `varchar(255)`. Users are provisioned just-in-time on first authenticated request.
+**Application-owned user identity.** `app_user.id` is an application-generated UUIDv7, and it is
+typed: `UserId` is part of the identity module's published API, and every cross-module contract
+speaks in `UserId` rather than raw `UUID`. Every identifier in this system is a UUID underneath,
+so a raw one in a contract is a parameter the compiler cannot check — passing an organization id
+where a user id belongs would compile perfectly. Unwrapping happens only at the persistence and
+JSON boundaries, and an ArchUnit rule keeps it that way. The external identity is an attribute: `UNIQUE (oidc_issuer, oidc_subject)`, both `varchar(255)`. Users are provisioned just-in-time on first authenticated request.
 
 **Two-phase authority for asynchronous work.** Roles live in a token and cannot be re-evaluated on a batch thread. So for imports: global role authorization happens once, at admission, against a verified token, and the basis is recorded as `authorization_mode ∈ {ORGANIZATION_MEMBER, ADMIN_OVERRIDE}`. During processing, everything that lives in the database — membership, organization status, period participation and state, submission editability, metric scope, value ranges — is re-checked against live data. The type carrying this (`ImportAuthority`) has no roles on it at all, and `Actor` is kept out of the imports module by an ArchUnit rule.
 

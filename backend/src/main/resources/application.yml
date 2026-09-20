@@ -38,6 +38,18 @@ spring:
       hibernate:
         default_schema: opsflow
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Signature keys are fetched from this issuer's JWKS and cached; there is
+          # no introspection call per request.
+          issuer-uri: ${OPSFLOW_OIDC_ISSUER_URI:http://localhost:8081/realms/opsflow}
+          # Set explicitly so signing keys are fetched on first use rather than during
+          # startup. Discovery would make a reachable identity provider a precondition
+          # for the application booting at all.
+          jwk-set-uri: ${OPSFLOW_OIDC_JWK_SET_URI:http://localhost:8081/realms/opsflow/protocol/openid-connect/certs}
+
   # Structured logs as JSON, using Spring Boot's built-in support. MDC entries —
   # including correlationId — are emitted as fields, so logs are queryable
   # without a log-parsing regex. Overridden to plain text for local development.
@@ -60,6 +72,15 @@ server:
     # profile. The problem detail carries a correlation id instead.
     include-stacktrace: never
     include-message: never
+
+opsflow:
+  security:
+    # A token signed by the right issuer still is not necessarily meant for this API.
+    # Requiring this audience is what prevents a token minted for another client from
+    # being replayed here.
+    audience: ${OPSFLOW_OIDC_AUDIENCE:opsflow-api}
+    # Exact origins only. Never a wildcard.
+    allowed-origins: ${OPSFLOW_CORS_ALLOWED_ORIGINS:http://localhost:4200}
 
 springdoc:
   api-docs:
