@@ -1,0 +1,95 @@
+# Local development
+
+## Required tooling
+
+| Tool | Version | Check |
+|---|---|---|
+| JDK | 21 (LTS) | `java -version` |
+| Node | ≥ 24.15.0 | `node -v` |
+| Docker | with the Compose v2 plugin | `docker compose version` |
+| Make | any | `make --version` |
+
+`make preflight` checks all of these at once and names what is missing.
+
+Gradle is **not** required: the repository ships a pinned wrapper (`backend/gradlew`). The
+Gradle distribution is checksum-pinned in `backend/gradle/wrapper/gradle-wrapper.properties`, so a
+swapped or corrupted download fails the build rather than executing.
+
+### Installing a JDK
+
+The toolchain is declared in `backend/build.gradle.kts`, so Gradle will use whichever Java 21
+installation it can find.
+
+**Debian / Ubuntu / WSL:**
+
+```bash
+sudo apt update && sudo apt install -y openjdk-21-jdk
+```
+
+**Without root**, install a user-local Temurin 21 and put it on your path:
+
+```bash
+mkdir -p ~/.local/jdks && cd ~/.local/jdks
+curl -L -o temurin21.tar.gz \
+  "https://api.adoptium.net/v3/binary/latest/21/ga/linux/x64/jdk/hotspot/normal/eclipse"
+tar xzf temurin21.tar.gz && rm temurin21.tar.gz
+# then add to ~/.bashrc:
+#   export JAVA_HOME="$HOME/.local/jdks/$(ls ~/.local/jdks | head -1)"
+#   export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+### Installing the Docker Compose v2 plugin
+
+```bash
+sudo apt install -y docker-compose-v2
+```
+
+Or, without root, as a Docker CLI plugin in your home directory:
+
+```bash
+mkdir -p ~/.docker/cli-plugins
+curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
+  -o ~/.docker/cli-plugins/docker-compose
+chmod +x ~/.docker/cli-plugins/docker-compose
+```
+
+On WSL with Docker Desktop, enable integration for this distribution in
+*Docker Desktop → Settings → Resources → WSL Integration* instead.
+
+## Daily loop
+
+```bash
+make up      # PostgreSQL in Docker
+             # backend and frontend run from your IDE against it
+```
+
+Run the backend with the `local` Spring profile, and the frontend with `npm start`.
+
+`make down` stops the stack and keeps your data. `make clean` deletes the data volume and all
+build output.
+
+## Configuration
+
+`make up` copies `.env.example` to `.env` on first run. `.env` is git-ignored and must never be
+committed. Nothing in it is a production value — deployed environments supply every setting
+through the environment.
+
+## Running checks
+
+```bash
+make test     # backend (unit + ArchUnit) and frontend tests
+make lint     # Spotless, ESLint, Prettier
+make format   # auto-fix formatting in both projects
+make build    # full build of both projects
+```
+
+CI runs exactly these, so a green `make test && make lint` locally means a green pipeline.
+
+## Conventions
+
+- **Commits** follow [Conventional Commits](https://www.conventionalcommits.org/):
+  `feat(submission): add reject command with mandatory reason`. The scope is the module. The body
+  explains *why*; the diff already shows what.
+- **Branches** are short-lived and named `feat/…`, `fix/…`, `chore/…` or `docs/…`. Rebase on
+  `main` before opening a pull request.
+- **`main` must build and run after every merge.** Each milestone leaves the repository working.

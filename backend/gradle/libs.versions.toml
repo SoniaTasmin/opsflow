@@ -1,0 +1,33 @@
+# OpsFlow dependency version catalogue.
+#
+# Every version is pinned exactly: no ranges, no "+", no dynamic versions.
+# Verified against Maven Central on 2026-09-20 (see docs/adr/0007-technology-versions.md).
+
+[versions]
+# --- Spring ---------------------------------------------------------------
+# Spring Boot 3.x reached end of OSS support on 2026-06-30 (final patch 3.5.16),
+# so the 3.x line is not an option. 4.1.1 is the current GA.
+springBoot = "4.1.1"
+springDependencyManagement = "1.1.7"
+
+# --- Build plugins --------------------------------------------------------
+spotless = "7.0.4"
+palantirJavaFormat = "2.68.0"
+
+# --- Test -----------------------------------------------------------------
+# Spring Boot 4 mandates JUnit Jupiter 6 and removes JUnit 4 support entirely;
+# the Jupiter version itself is managed by the Spring Boot BOM.
+#
+# We depend on archunit CORE rather than archunit-junit5. The JUnit 5 extension
+# (@AnalyzeClasses) is built against the JUnit Platform 1.x API and has not been
+# verified against Platform 6. Plain Jupiter tests that invoke ArchRule.check()
+# directly give identical coverage with no compatibility exposure.
+archunit = "1.4.1"
+
+[libraries]
+archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
