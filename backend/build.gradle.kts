@@ -20,8 +20,23 @@ java {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    // Spring Boot 4 no longer auto-configures Flyway from the bare dependency.
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
+    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation(libs.springdoc.openapi.starter.webmvc.ui)
 
+    runtimeOnly("org.postgresql:postgresql")
+
+    testImplementation(platform(libs.testcontainers.bom))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    // Spring Boot 4 splits the test slices into per-technology modules;
+    // @WebMvcTest is no longer part of spring-boot-starter-test.
+    testImplementation("org.springframework.boot:spring-boot-webmvc-test")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-postgresql")
     testImplementation(libs.archunit)
 }
 
