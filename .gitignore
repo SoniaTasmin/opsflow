@@ -29,6 +29,20 @@ frontend/.vscode/
 .classpath
 .settings/
 
+# --- AI assistant / local agent files ---
+# Local assistant state and per-machine tool config. Engineering documentation
+# (README.md, docs/, ADRs, CONTRIBUTING.md) is deliberately NOT covered here.
+CLAUDE.md
+.claude/
+.claude/**
+*.claude.*
+.cursor/
+.cursorrules
+.aider*
+.windsurfrules
+.continue/
+.codeium/
+
 # --- OS ---
 .DS_Store
 Thumbs.db
