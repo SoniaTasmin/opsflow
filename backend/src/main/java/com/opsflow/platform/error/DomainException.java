@@ -21,7 +21,11 @@ import java.util.Map;
  * because it is serialised to the client.
  */
 public abstract sealed class DomainException extends RuntimeException
-        permits AccessDeniedDomainException, BusinessRuleException, ConflictException, NotFoundException {
+        permits AccessDeniedDomainException,
+                BusinessRuleException,
+                ConflictException,
+                MalformedRequestException,
+                NotFoundException {
 
     private final ErrorCode errorCode;
     private final transient Map<String, Object> context;

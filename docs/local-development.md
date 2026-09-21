@@ -133,6 +133,23 @@ docker run --rm --network host --ipc=host \
 With the libraries installed locally, `npx playwright install --with-deps chromium && npm run e2e`
 does the same thing.
 
+## CSV import format
+
+```csv
+organization_code,metric_code,value,note
+BERLIN_OPS,HEADCOUNT,42,from the finance export
+BERLIN_OPS,REVENUE,128500.50,
+```
+
+The header must match exactly; a wrong one fails the import without touching a row. The reporting
+period comes from the upload request, not from the file — one upload targets one period, and a
+period column would let a single file write across periods the request was never authorized for.
+
+Limits: 20 MB and 100,000 data rows. If the same metric appears twice for the same organization,
+the last value wins and the earlier row is reported. Every row that cannot be applied is listed
+with its line number and the rule that refused it; a rule that invalidates a whole organization's
+rows is recorded once, with the number of rows it cost.
+
 ## Running checks
 
 ```bash

@@ -16,6 +16,8 @@ public interface SubmissionRepository {
 
     Optional<SubmissionView> viewByOrganizationAndPeriod(OrganizationId organizationId, PeriodId reportingPeriodId);
 
+    Optional<Submission> findByOrganizationAndPeriod(OrganizationId organizationId, PeriodId reportingPeriodId);
+
     Submission insert(Submission submission, UserId createdBy);
 
     Submission update(Submission submission, long expectedVersion, UserId updatedBy);

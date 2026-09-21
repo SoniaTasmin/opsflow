@@ -16,6 +16,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -51,6 +52,12 @@ public class GlobalExceptionHandler {
         log.warn("Business rule violated: rule={} detail={}", ex.ruleCode(), ex.getMessage());
         // The specific rule code replaces the generic enum name: it is what a client switches on.
         return problems.create(ex.errorCode(), ex.ruleCode(), ex.getMessage(), ex.context(), List.of());
+    }
+
+    @ExceptionHandler(MalformedRequestException.class)
+    public ProblemDetail handleMalformedRequest(MalformedRequestException ex) {
+        log.warn("Malformed request: code={} detail={}", ex.code(), ex.getMessage());
+        return problems.create(ex.errorCode(), ex.code(), ex.getMessage(), ex.context(), List.of());
     }
 
     @ExceptionHandler(DomainException.class)
@@ -128,6 +135,12 @@ public class GlobalExceptionHandler {
                 "A required parameter is missing",
                 Map.of(),
                 List.of(ApiFieldError.of(ex.getParameterName(), "REQUIRED", "Parameter is required")));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ProblemDetail handleUploadTooLarge(MaxUploadSizeExceededException ex) {
+        log.warn("Rejected an upload above the configured limit: maxBytes={}", ex.getMaxUploadSize());
+        return problems.create(ErrorCode.PAYLOAD_TOO_LARGE, "The uploaded file is larger than this API accepts");
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

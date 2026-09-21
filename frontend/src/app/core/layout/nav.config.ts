@@ -16,6 +16,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     roles: ['USER', 'REVIEWER', 'ADMIN'],
   },
   { label: 'Review queue', path: '/review', icon: 'fact_check', roles: ['REVIEWER', 'ADMIN'] },
+  { label: 'CSV imports', path: '/imports', icon: 'upload_file', roles: ['USER', 'ADMIN'] },
   { label: 'Organizations', path: '/admin/organizations', icon: 'apartment', roles: ['ADMIN'] },
   { label: 'Metrics', path: '/admin/metrics', icon: 'straighten', roles: ['ADMIN'] },
   { label: 'Reporting periods', path: '/admin/periods', icon: 'event', roles: ['ADMIN'] },

@@ -27,6 +27,22 @@ spring:
     # including local: pointing it at the wrong URL is how people lose data.
     clean-disabled: true
 
+  batch:
+    jdbc:
+      # Batch 6 defaults to an in-memory repository; without persisted metadata there is
+      # nothing to recover from after a restart. The tables are created by Flyway, not by
+      # Boot's startup script, so the schema has one owner.
+      initialize-schema: never
+      table-prefix: batch.BATCH_
+    job:
+      # Imports are launched when a user uploads one, never because the application started.
+      enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 21MB
+
   jpa:
     open-in-view: false
     hibernate:
@@ -85,6 +101,17 @@ opsflow:
   workflow:
     # Segregation of duties: the person who submitted a report may not approve it.
     allow-self-approval: ${OPSFLOW_ALLOW_SELF_APPROVAL:false}
+
+  imports:
+    # Local disk, one replica. Object storage and a job lease are what horizontal
+    # scaling would need, and neither is built (ADR-0009).
+    storage-directory: ${OPSFLOW_IMPORT_STORAGE_DIR:./var/imports}
+    max-rows: 100000
+    chunk-size: 500
+    # Beyond this the file needs fixing rather than reading, and an unbounded error
+    # table would bury the rows a user can act on.
+    max-errors: 5000
+    concurrency: 2
 
 springdoc:
   api-docs:

@@ -92,6 +92,11 @@ class JpaSubmissionRepository implements SubmissionRepository {
     }
 
     @Override
+    public Optional<Submission> findByOrganizationAndPeriod(OrganizationId organizationId, PeriodId reportingPeriodId) {
+        return viewByOrganizationAndPeriod(organizationId, reportingPeriodId).flatMap(view -> findById(view.id()));
+    }
+
+    @Override
     public Submission insert(Submission submission, UserId createdBy) {
         SubmissionEntity entity = new SubmissionEntity(
                 submission.id().value(),
