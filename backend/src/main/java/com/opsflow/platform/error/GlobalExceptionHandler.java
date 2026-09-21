@@ -10,6 +10,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -132,6 +133,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ProblemDetail handleNoResource(NoResourceFoundException ex) {
         return problems.create(ErrorCode.RESOURCE_NOT_FOUND, "No endpoint matches this request");
+    }
+
+    // ----------------------------------------------------------- authorization
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+        // Method security denial: the caller is authenticated, so 403 is correct. A denial
+        // that must not confirm the resource exists is thrown as NotFoundException instead.
+        log.info("Denied an authenticated request: {}", ex.getMessage());
+        return problems.create(ErrorCode.ACCESS_DENIED, "You do not have permission to perform this action");
     }
 
     // ------------------------------------------------------------- catch-all

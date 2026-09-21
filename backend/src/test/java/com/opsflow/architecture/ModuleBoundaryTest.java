@@ -55,18 +55,23 @@ class ModuleBoundaryTest {
                 .definedBy("com.opsflow.submission..")
                 .layer("imports")
                 .definedBy("com.opsflow.imports..")
-                .whereLayer("imports")
+                // Depends on every module; nothing depends on it.
+                .layer("composition")
+                .definedBy("com.opsflow.composition..")
+                .whereLayer("composition")
                 .mayNotBeAccessedByAnyLayer()
+                .whereLayer("imports")
+                .mayOnlyBeAccessedByLayers("composition")
                 .whereLayer("submission")
-                .mayOnlyBeAccessedByLayers("imports")
+                .mayOnlyBeAccessedByLayers("imports", "composition")
                 .whereLayer("reporting")
-                .mayOnlyBeAccessedByLayers("submission", "imports")
+                .mayOnlyBeAccessedByLayers("submission", "imports", "composition")
                 .whereLayer("organization")
-                .mayOnlyBeAccessedByLayers("reporting", "submission", "imports")
+                .mayOnlyBeAccessedByLayers("reporting", "submission", "imports", "composition")
                 .whereLayer("identity")
-                .mayOnlyBeAccessedByLayers("organization", "reporting", "submission", "imports")
+                .mayOnlyBeAccessedByLayers("organization", "reporting", "submission", "imports", "composition")
                 .because("the module order is platform -> identity -> organization -> reporting"
-                        + " -> submission -> imports, and a back-edge would create a cycle")
+                        + " -> submission -> imports -> composition, and a back-edge would create a cycle")
                 .check(classes);
     }
 }
