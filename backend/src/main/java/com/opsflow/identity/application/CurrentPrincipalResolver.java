@@ -3,6 +3,7 @@ package com.opsflow.identity.application;
 
 import com.opsflow.identity.Actor;
 import com.opsflow.identity.CurrentActorProvider;
+import com.opsflow.identity.CurrentUserProfile;
 import com.opsflow.identity.CurrentUserProvider;
 import com.opsflow.identity.UserId;
 import com.opsflow.identity.domain.ExternalIdentity;
@@ -32,7 +33,7 @@ import org.springframework.web.context.request.RequestContextHolder;
  * measurement shows the lookup matters.
  */
 @Component
-class CurrentPrincipalResolver implements CurrentActorProvider, CurrentUserProvider {
+class CurrentPrincipalResolver implements CurrentActorProvider, CurrentUserProvider, CurrentUserProfile {
 
     private static final String REQUEST_ATTRIBUTE = CurrentPrincipalResolver.class.getName() + ".actor";
 
@@ -55,6 +56,15 @@ class CurrentPrincipalResolver implements CurrentActorProvider, CurrentUserProvi
         return currentActor().map(Actor::userId);
     }
 
+    @Override
+    public Optional<SelfProfile> current() {
+        return currentJwt().map(jwt -> {
+            User user = provisioning.resolve(externalIdentityOf(jwt), profileOf(jwt));
+            return new SelfProfile(
+                    user.id(), user.username(), user.displayName(), user.email().orElse(null));
+        });
+    }
+
     private Optional<Actor> currentActor() {
         RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
@@ -73,16 +83,27 @@ class CurrentPrincipalResolver implements CurrentActorProvider, CurrentUserProvi
         return resolved;
     }
 
-    private Optional<Actor> resolveFromSecurityContext() {
+    private Optional<Jwt> currentJwt() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)
                 || !authentication.isAuthenticated()) {
             return Optional.empty();
         }
+        return Optional.of(jwtAuthentication.getToken());
+    }
 
-        Jwt jwt = jwtAuthentication.getToken();
-        ExternalIdentity externalIdentity = new ExternalIdentity(jwt.getIssuer().toString(), jwt.getSubject());
-        User user = provisioning.resolve(externalIdentity, profileOf(jwt));
+    private static ExternalIdentity externalIdentityOf(Jwt jwt) {
+        return new ExternalIdentity(jwt.getIssuer().toString(), jwt.getSubject());
+    }
+
+    private Optional<Actor> resolveFromSecurityContext() {
+        Optional<Jwt> maybeJwt = currentJwt();
+        if (maybeJwt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Jwt jwt = maybeJwt.get();
+        User user = provisioning.resolve(externalIdentityOf(jwt), profileOf(jwt));
 
         // Roles come from this request's token every time, never from the stored user.
         Set<Role> roles = JwtRoleConverter.rolesOf(jwt);

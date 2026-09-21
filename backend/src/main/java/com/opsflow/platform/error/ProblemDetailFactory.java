@@ -6,6 +6,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +21,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ProblemDetailFactory {
+
+    private static final Logger log = LoggerFactory.getLogger(ProblemDetailFactory.class);
+
+    private static final Set<String> RESERVED_PROPERTIES =
+            Set.of("type", "title", "status", "detail", "instance", "code", "timestamp", "correlationId", "errors");
 
     private final Clock clock;
 
@@ -48,6 +56,17 @@ public class ProblemDetailFactory {
                 org.springframework.http.HttpStatusCode.valueOf(errorCode.status()), detail);
         problem.setType(java.net.URI.create(errorCode.typeUri()));
         problem.setTitle(errorCode.title());
+
+        // Context first, reserved fields last: a context key such as "code" would otherwise
+        // overwrite the machine-readable error code.
+        context.forEach((key, value) -> {
+            if (RESERVED_PROPERTIES.contains(key)) {
+                log.warn("Ignoring error context entry '{}': it would overwrite a reserved problem field", key);
+                return;
+            }
+            problem.setProperty(key, value);
+        });
+
         problem.setProperty("code", code);
         problem.setProperty("timestamp", Instant.now(clock).toString());
         CorrelationId.current().ifPresent(id -> problem.setProperty("correlationId", id));
@@ -55,7 +74,6 @@ public class ProblemDetailFactory {
         if (!fieldErrors.isEmpty()) {
             problem.setProperty("errors", fieldErrors);
         }
-        context.forEach(problem::setProperty);
         return problem;
     }
 }

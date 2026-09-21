@@ -79,6 +79,20 @@ class IdentityBoundaryRulesTest {
     }
 
     @Test
+    void membershipCarriesNoRole() {
+        // A role here would mean two sources of truth for authorization again.
+        noClasses()
+                .that()
+                .resideInAPackage("com.opsflow.organization.domain..")
+                .should()
+                .dependOnClassesThat()
+                .haveFullyQualifiedName("com.opsflow.platform.domain.Role")
+                .allowEmptyShould(true)
+                .because("membership is a set of users and carries no role of its own (ADR-0003)")
+                .check(classes);
+    }
+
+    @Test
     void nothingPersistsCredentialsOrTokens() {
         noClasses()
                 .that()

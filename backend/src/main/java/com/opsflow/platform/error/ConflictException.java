@@ -9,7 +9,7 @@ import java.util.Map;
  * <p>Use for optimistic-lock failures, uniqueness violations and illegal state transitions —
  * not for business rules, which are {@link BusinessRuleException} (422). See {@link ErrorCode}.
  */
-public final class ConflictException extends DomainException {
+public non-sealed class ConflictException extends DomainException {
 
     public ConflictException(ErrorCode errorCode, String message) {
         super(requireConflict(errorCode), message);

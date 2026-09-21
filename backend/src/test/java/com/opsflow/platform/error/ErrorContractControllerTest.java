@@ -84,6 +84,20 @@ class ErrorContractControllerTest {
     }
 
     @Test
+    void errorContextCannotOverwriteAReservedProblemField() throws Exception {
+        // An exception's context map is supplied by whoever threw it. A key like "code"
+        // would otherwise overwrite the machine-readable error code with an unrelated
+        // value - silently, and only for the exceptions that happen to carry that key.
+        mockMvc.perform(get("/__test/hostile-context"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("VERSION_CONFLICT"))
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.title").value("Version conflict"))
+                // A non-reserved key is still carried through.
+                .andExpect(jsonPath("$.organizationCode").value("BERLIN_OPS"));
+    }
+
+    @Test
     void accessDeniedIs403() throws Exception {
         mockMvc.perform(get("/__test/denied"))
                 .andExpect(status().isForbidden())
@@ -186,6 +200,18 @@ class ErrorContractControllerTest {
         void conflict() {
             throw new ConflictException(
                     ErrorCode.VERSION_CONFLICT, "Submission was modified concurrently", Map.of("expectedVersion", 7));
+        }
+
+        @GetMapping("/__test/hostile-context")
+        void hostileContext() {
+            throw new ConflictException(
+                    ErrorCode.VERSION_CONFLICT,
+                    "Concurrent modification",
+                    Map.of(
+                            "code", "SHOULD_NOT_WIN",
+                            "status", 999,
+                            "title", "should not win",
+                            "organizationCode", "BERLIN_OPS"));
         }
 
         @GetMapping("/__test/denied")

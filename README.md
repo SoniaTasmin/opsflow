@@ -6,9 +6,10 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M2 of 10 complete.** Toolchain, CI, platform foundations and authentication are in
-> place: you can log in against Keycloak and call a protected endpoint. Organizations start at
-> M3. See [the roadmap](#roadmap) for what does and does not exist.
+> **Status: M3 of 10 complete.** Toolchain, CI, platform foundations, authentication and
+> organizations are in place: you can log in, and an administrator can create organizations and
+> manage who belongs to them. Metrics and reporting periods start at M4. See
+> [the roadmap](#roadmap) for what does and does not exist.
 
 ## Why this project is interesting
 
@@ -66,8 +67,11 @@ docs/        Architecture notes and Architecture Decision Records
 Backend modules, in strict dependency order:
 
 ```
-platform -> identity -> organization -> reporting -> submission -> imports
+platform -> identity -> organization -> reporting -> submission -> imports -> composition
 ```
+
+`composition` is a thin layer for endpoints shaped by what a client needs rather than by any one
+capability — `/api/v1/me` is the first. It may depend on every module; nothing may depend on it.
 
 The order is total, so cycles are impossible by construction and ArchUnit fails the build on any
 back-edge.
@@ -79,7 +83,7 @@ back-edge.
 | M0 | Repository, toolchain, CI | ✅ Complete |
 | M1 | Platform foundations: error contract, correlation IDs, Flyway, Testcontainers | ✅ Complete |
 | M2 | Security and identity: Keycloak, OIDC resource server, user provisioning | ✅ Complete |
-| M3 | Organizations and membership | Not started |
+| M3 | Organizations and membership | ✅ Complete |
 | M4 | Metric catalogue and reporting periods | Not started |
 | M5 | Angular shell, authentication, admin screens | Not started |
 | M6 | Submissions and the review workflow | Not started |

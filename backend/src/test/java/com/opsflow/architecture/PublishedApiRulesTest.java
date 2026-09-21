@@ -16,13 +16,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-/**
- * What a module may show to the rest of the application, and in what terms.
- *
- * <p>The module dependency <em>order</em> is enforced elsewhere; these rules govern the
- * <em>surface</em>: which package other modules may reach into, and whether the types crossing
- * that boundary are meaningful or merely structural.
- */
+/** The module dependency order is enforced elsewhere; these rules govern the surface. */
 class PublishedApiRulesTest {
 
     private static final List<String> MODULES =
@@ -39,10 +33,8 @@ class PublishedApiRulesTest {
 
     @Test
     void modulesTalkToEachOtherOnlyThroughTheirPublishedRootPackage() {
-        // A module's root package is its contract; domain, application, infrastructure and
-        // api are its internals. Without this rule the layered-architecture check still
-        // passes while another module reaches straight into an aggregate — at which point
-        // the boundary is decorative.
+        // Without this, the layered check still passes while another module reaches
+        // straight into an aggregate.
         for (String module : MODULES) {
             noClasses()
                     .that()
@@ -62,22 +54,16 @@ class PublishedApiRulesTest {
 
     @Test
     void publishedModuleApisUseTypedIdentifiersRatherThanRawUuids() {
-        // Every identifier in this system is a UUID underneath, so a raw one in a contract
-        // is a parameter the compiler cannot check: passing an organization id where a user
-        // id belongs compiles perfectly and fails at runtime, or silently does the wrong
-        // thing. Typed ids make that a compile error.
-        //
-        // Unwrapping to UUID is legitimate at the two edges — persistence and JSON — which
-        // live in infrastructure and api, below the published surface this rule covers.
+        // Every identifier here is a UUID underneath, so a raw one in a contract is a
+        // parameter the compiler cannot check. Unwrapping is legitimate at the persistence
+        // and JSON edges, which sit below this surface.
         for (String module : MODULES) {
             methods()
                     .that()
                     .areDeclaredInClassesThat()
                     .resideInAPackage("com.opsflow." + module)
                     .and()
-                    // The typed identifiers themselves are exactly the types that wrap and
-                    // unwrap a UUID; excluding them is what makes the rule about everything
-                    // else meaningful.
+                    // The identifier types are the ones that legitimately wrap a UUID.
                     .areDeclaredInClassesThat()
                     .haveSimpleNameNotEndingWith("Id")
                     .and()
