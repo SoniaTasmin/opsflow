@@ -8,7 +8,7 @@
  * Do not edit the class manually.
  */
 
-export interface Entry {
+export interface MetricScopeEntry {
   metricId: string;
   required?: boolean;
   displayOrder?: number;

@@ -40,3 +40,9 @@ The summary reads the frozen participant set through `PeriodQuery.participantsOf
 **A separate `workflow` module.** Rejected: it owns no data, so the boundary would cut straight through the invariant that matters most.
 
 **Status in a separate table.** Rejected: it turns every transition into a two-table transactional dance for no benefit.
+
+## Amendment (M6, implemented)
+
+This ADR anticipated `submission.domain.review` and `submission.application.review` sub-packages. They were not created: the review commands — `claim`, `release`, `approve`, `reject` — turn out to be state transitions on the `Submission` aggregate itself, and splitting a state machine across packages would hide it rather than separate it. The module's `application` layer holds two services, `SubmissionCommandService` and `SubmissionQueryService`, and needs no third level of packaging yet.
+
+The split that did prove necessary is a different one: the aggregate owns the state machine, the values and the transition log, while the application service owns the rules that need another aggregate — the period being open, the organization participating in it — and the organization-scoped authorization that cannot be decided until the submission has been read.

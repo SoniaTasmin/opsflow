@@ -10,6 +10,9 @@ export * from './organizations.serviceInterface';
 export * from './reporting-periods.service';
 import { ReportingPeriodsService } from './reporting-periods.service';
 export * from './reporting-periods.serviceInterface';
+export * from './submissions.service';
+import { SubmissionsService } from './submissions.service';
+export * from './submissions.serviceInterface';
 export * from './users.service';
 import { UsersService } from './users.service';
 export * from './users.serviceInterface';
@@ -18,5 +21,6 @@ export const APIS = [
   MetricsService,
   OrganizationsService,
   ReportingPeriodsService,
+  SubmissionsService,
   UsersService,
 ];

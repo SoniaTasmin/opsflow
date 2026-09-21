@@ -1,0 +1,102 @@
+@if (submission(); as detail) {
+  <app-page-header
+    [title]="detail.periodCode + ' · ' + detail.organizationCode"
+    [subtitle]="'Due ' + detail.submissionDeadline"
+  >
+    <a matButton routerLink="/submissions">Back to submissions</a>
+  </app-page-header>
+
+  <div class="status-bar">
+    <app-status-chip [status]="detail.status" />
+    @if (detail.submittedByName) {
+      <span class="meta">Submitted by {{ detail.submittedByName }}</span>
+    }
+    @if (detail.reviewerName) {
+      <span class="meta">Being reviewed by {{ detail.reviewerName }}</span>
+    }
+    @if (detail.decidedByName) {
+      <span class="meta">Decided by {{ detail.decidedByName }}</span>
+    }
+  </div>
+
+  @if (detail.rejectionReason) {
+    <mat-card appearance="outlined" class="rejection">
+      <mat-card-content>
+        <mat-icon>undo</mat-icon>
+        <div>
+          <strong>Returned for correction</strong>
+          <p>{{ detail.rejectionReason }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <div class="layout">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Values</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @for (metric of detail.metrics; track metric.metricId) {
+          <div class="metric">
+            <mat-form-field appearance="outline">
+              <mat-label>
+                {{ metric.name }}
+                @if (metric.required) {
+                  *
+                }
+              </mat-label>
+              <input
+                matInput
+                type="number"
+                [attr.data-metric]="metric.code"
+                [disabled]="!editable()"
+                [ngModel]="field(metric.metricId).value"
+                (ngModelChange)="setValue(metric.metricId, $event)"
+              />
+              <mat-hint>{{ hint(metric) }}</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="note">
+              <mat-label>Note</mat-label>
+              <input
+                matInput
+                maxlength="500"
+                [disabled]="!editable()"
+                [ngModel]="field(metric.metricId).note"
+                (ngModelChange)="setNote(metric.metricId, $event)"
+              />
+            </mat-form-field>
+          </div>
+        }
+      </mat-card-content>
+      <mat-card-actions align="end">
+        @if (editable()) {
+          <button matButton="filled" data-action="save" (click)="save()">Save values</button>
+          <button matButton="tonal" data-action="submit" (click)="submit()">Send for review</button>
+        }
+        @if (status() === 'SUBMITTED') {
+          <button matButton data-action="withdraw" (click)="withdraw()">Withdraw</button>
+        }
+        @if (canReview()) {
+          @if (status() === 'SUBMITTED') {
+            <button matButton="filled" data-action="claim" (click)="claim()">Claim review</button>
+          }
+          @if (status() === 'UNDER_REVIEW') {
+            <button matButton data-action="release" (click)="release()">Release</button>
+            <button matButton="tonal" data-action="reject" (click)="reject()">Reject</button>
+            <button matButton="filled" data-action="approve" (click)="approve()">Approve</button>
+          }
+        }
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>History</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-submission-timeline [entries]="facade.history()" />
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

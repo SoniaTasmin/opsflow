@@ -7,9 +7,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Entry } from './entry';
+import { MetricScopeEntry } from './metric-scope-entry';
 
 export interface SetMetricScopeRequest {
-  metrics: Array<Entry>;
+  metrics: Array<MetricScopeEntry>;
   version?: number;
 }

@@ -3,10 +3,15 @@ package com.opsflow.architecture;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +31,24 @@ class WebBoundaryRulesTest {
         classes = new ClassFileImporter()
                 .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages("com.opsflow");
+    }
+
+    /**
+     * springdoc keys a schema by the type's simple name, so two identically named DTOs -- for
+     * instance a nested {@code Entry} in two different requests -- collapse into one schema and
+     * the generated client types one of them wrongly, while still compiling.
+     */
+    @Test
+    void apiTypesDoNotShareASimpleName() {
+        Map<String, List<String>> byName = classes.stream()
+                .filter(type -> type.getPackageName().contains(".api."))
+                .filter(type -> !type.getSimpleName().isEmpty())
+                .collect(Collectors.groupingBy(
+                        JavaClass::getSimpleName, Collectors.mapping(JavaClass::getFullName, Collectors.toList())));
+
+        assertThat(byName)
+                .allSatisfy((name, types) ->
+                        assertThat(types).as("DTOs named %s", name).hasSize(1));
     }
 
     @Test

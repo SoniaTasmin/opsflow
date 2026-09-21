@@ -2,6 +2,7 @@ import { ApplicationConfig, provideAppInitializer, inject } from '@angular/core'
 import { provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { AbstractSecurityStorage, provideAuth } from 'angular-auth-oidc-client';
 import { firstValueFrom } from 'rxjs';
 
@@ -21,6 +22,8 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding()),
     provideAuth(authConfig),
+    // mat-datepicker has no adapter of its own; without this the period form throws on open.
+    provideNativeDateAdapter(),
     { provide: AbstractSecurityStorage, useClass: InMemorySecurityStorage },
     provideHttpClient(
       // Order matters: correlation id and bearer token are attached on the way out,

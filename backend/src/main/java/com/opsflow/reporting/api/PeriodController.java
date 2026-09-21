@@ -3,6 +3,7 @@ package com.opsflow.reporting.api;
 
 import com.opsflow.organization.OrganizationId;
 import com.opsflow.platform.web.PageResponse;
+import com.opsflow.platform.web.VersionedRequest;
 import com.opsflow.reporting.PeriodCode;
 import com.opsflow.reporting.PeriodId;
 import com.opsflow.reporting.PeriodStatus;
@@ -15,7 +16,6 @@ import com.opsflow.reporting.api.dto.ReschedulePeriodRequest;
 import com.opsflow.reporting.api.dto.ScopedMetricResponse;
 import com.opsflow.reporting.api.dto.SetMetricScopeRequest;
 import com.opsflow.reporting.api.dto.SetParticipantsRequest;
-import com.opsflow.reporting.api.dto.VersionedRequest;
 import com.opsflow.reporting.application.PeriodCommandService;
 import com.opsflow.reporting.application.PeriodQueryService;
 import com.opsflow.reporting.domain.ReportingPeriodRepository;

@@ -1,0 +1,50 @@
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.meta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.rejection {
+  margin-bottom: 1rem;
+}
+
+.rejection mat-card-content {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.rejection p {
+  margin: 0.25rem 0 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.metric mat-form-field {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .layout,
+  .metric {
+    grid-template-columns: 1fr;
+  }
+}

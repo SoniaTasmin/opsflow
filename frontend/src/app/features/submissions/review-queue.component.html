@@ -1,0 +1,58 @@
+<app-page-header title="Review queue" subtitle="Submissions waiting for a decision" />
+
+<mat-button-toggle-group
+  class="filters"
+  [ngModel]="statusFilter()"
+  (ngModelChange)="statusFilter.set($event); applyFilter()"
+>
+  <mat-button-toggle value="SUBMITTED">Waiting</mat-button-toggle>
+  <mat-button-toggle value="UNDER_REVIEW">Being reviewed</mat-button-toggle>
+  <mat-button-toggle value="APPROVED">Approved</mat-button-toggle>
+  <mat-button-toggle value="REJECTED">Returned</mat-button-toggle>
+</mat-button-toggle-group>
+
+@if (facade.submissions().length === 0 && !facade.loading()) {
+  <app-empty-state icon="fact_check" message="Nothing waiting for review." />
+} @else {
+  <table mat-table [dataSource]="facade.submissions()" class="table">
+    <ng-container matColumnDef="period">
+      <th mat-header-cell *matHeaderCellDef>Period</th>
+      <td mat-cell *matCellDef="let submission">
+        <strong>{{ submission.periodCode }}</strong>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="organization">
+      <th mat-header-cell *matHeaderCellDef>Organization</th>
+      <td mat-cell *matCellDef="let submission">
+        {{ submission.organizationCode }} — {{ submission.organizationName }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let submission">
+        <app-status-chip [status]="submission.status" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="submitted">
+      <th mat-header-cell *matHeaderCellDef>Submitted</th>
+      <td mat-cell *matCellDef="let submission">{{ submission.submittedAt | date: 'short' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
+      <td mat-cell *matCellDef="let submission" class="actions-column">
+        <a matButton [routerLink]="['/submissions', submission.id]">Review</a>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  <mat-paginator
+    [length]="facade.total()"
+    [pageIndex]="page()"
+    [pageSize]="size()"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="changePage($event)"
+  />
+}

@@ -19,6 +19,13 @@ public record NumericRange(BigDecimal min, BigDecimal max) {
         }
     }
 
+    /** The narrower of the two bounds on each side. */
+    public NumericRange intersect(NumericRange other) {
+        BigDecimal lower = min == null ? other.min : other.min == null ? min : min.max(other.min);
+        BigDecimal upper = max == null ? other.max : other.max == null ? max : max.min(other.max);
+        return new NumericRange(lower, upper);
+    }
+
     public boolean contains(BigDecimal value) {
         if (value == null) {
             return false;

@@ -2,13 +2,13 @@
 package com.opsflow.reporting.api;
 
 import com.opsflow.platform.web.PageResponse;
+import com.opsflow.platform.web.VersionedRequest;
 import com.opsflow.reporting.MetricCode;
 import com.opsflow.reporting.MetricId;
 import com.opsflow.reporting.NumericRange;
 import com.opsflow.reporting.api.dto.CreateMetricRequest;
 import com.opsflow.reporting.api.dto.MetricResponse;
 import com.opsflow.reporting.api.dto.UpdateMetricRequest;
-import com.opsflow.reporting.api.dto.VersionedRequest;
 import com.opsflow.reporting.application.MetricCommandService;
 import com.opsflow.reporting.application.MetricQueryService;
 import com.opsflow.reporting.domain.MetricRepository;
