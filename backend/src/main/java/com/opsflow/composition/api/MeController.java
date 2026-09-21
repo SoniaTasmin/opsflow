@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Comparator;
 import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * forbids identity from asking organization anything.
  */
 @RestController
-@RequestMapping("/api/v1/me")
+@RequestMapping(path = "/api/v1/me", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Identity", description = "The authenticated user")
 public class MeController {
 
@@ -45,6 +46,7 @@ public class MeController {
 
     @GetMapping
     @Operation(
+            operationId = "getCurrentUser",
             summary = "Describe the authenticated user",
             description = "Roles come from the token on every request and are never stored; "
                     + "membership comes from the database.")

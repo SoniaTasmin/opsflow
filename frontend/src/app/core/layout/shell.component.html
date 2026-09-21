@@ -1,0 +1,48 @@
+<mat-toolbar class="toolbar">
+  <button matIconButton (click)="toggleSidenav()" aria-label="Toggle navigation">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="toolbar__title">OpsFlow</span>
+  <span class="toolbar__spacer"></span>
+
+  <button matButton [matMenuTriggerFor]="accountMenu">
+    <mat-icon>account_circle</mat-icon>
+    {{ displayName() }}
+  </button>
+  <mat-menu #accountMenu="matMenu">
+    <div class="account">
+      <p class="account__name">{{ displayName() }}</p>
+      <p class="account__meta">{{ roles().join(', ') || 'No roles' }}</p>
+      @if (organizations().length) {
+        <p class="account__meta">{{ organizations().length }} organization(s)</p>
+      }
+    </div>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Sign out
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+@if (loading.isLoading()) {
+  <mat-progress-bar mode="indeterminate" />
+} @else {
+  <div class="progress-placeholder"></div>
+}
+
+<mat-sidenav-container class="layout">
+  <mat-sidenav [opened]="sidenavOpen()" mode="side" class="layout__nav">
+    <mat-nav-list>
+      @for (item of navItems(); track item.path) {
+        <a mat-list-item [routerLink]="item.path" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="layout__content">
+    <main><router-outlet /></main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

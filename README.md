@@ -6,9 +6,9 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M4 of 10 complete.** An administrator can define metrics, create a reporting period,
-> set its metric and organization scope, and open it. Submissions start at M6 (the Angular shell
-> is M5). See [the roadmap](#roadmap) for what does and does not exist.
+> **Status: M5 of 10 complete.** There is a working application: sign in through Keycloak and
+> administer organizations, members, metrics and reporting periods in the browser. Submissions
+> start at M6. See [the roadmap](#roadmap) for what does and does not exist.
 
 ## Why this project is interesting
 
@@ -29,6 +29,11 @@ Once there is something to look at, these are the parts worth reading:
   persisted; the database owns organization scope. The application mints its own `UserId` rather
   than using the OIDC `sub` as a primary key, so the identity provider is an integration and not
   the owner of every foreign key. See [ADR-0003](docs/adr/0003-identity-and-authorization.md).
+- **A compile-time API contract.** The Angular client is generated from the OpenAPI document;
+  response fields are marked required, so a field the server stops sending becomes a TypeScript
+  error rather than a runtime `undefined`.
+- **Tokens never touch browser storage.** The OIDC client is backed by an in-memory store, so an
+  XSS bug cannot read an access token back out of `localStorage`.
 - **One error contract, enforced.** Every failure is RFC 9457 `application/problem+json` with a
   stable machine-readable `code` and the request's correlation ID — including 500s, which leak
   nothing else. See [ADR-0010](docs/adr/0010-error-contract.md).
@@ -48,6 +53,10 @@ make build         # build both projects
 ```
 
 `make help` lists every target.
+
+To run the application itself: start the backend (`cd backend && ./gradlew bootRun`) and the
+frontend (`cd frontend && npm start`), then open `http://localhost:4200` and sign in as
+`admin` / `password`.
 
 Once the stack is up, Keycloak is at `http://localhost:8081` (admin/admin) with the `opsflow`
 realm imported. The local realm ships four users — `reporter`, `reviewer`, `admin` and
@@ -87,7 +96,7 @@ back-edge.
 | M2 | Security and identity: Keycloak, OIDC resource server, user provisioning | ✅ Complete |
 | M3 | Organizations and membership | ✅ Complete |
 | M4 | Metric catalogue and reporting periods | ✅ Complete |
-| M5 | Angular shell, authentication, admin screens | Not started |
+| M5 | Angular shell, authentication, admin screens | ✅ Complete |
 | M6 | Submissions and the review workflow | Not started |
 | M7 | CSV import with Spring Batch | Not started |
 | M8 | Period summary | Not started |

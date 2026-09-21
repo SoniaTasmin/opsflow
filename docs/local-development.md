@@ -107,6 +107,32 @@ build output.
 committed. Nothing in it is a production value — deployed environments supply every setting
 through the environment.
 
+## End-to-end tests
+
+The Playwright specs in `frontend/e2e/` drive the real Keycloak login page, so they need the
+whole stack up: `make up`, the backend on 8080, and the frontend on 4200. Serve the production
+build rather than `ng serve` — the dev server's file watcher is unreliable on Windows-mounted
+volumes and will happily serve a stale bundle.
+
+```bash
+cd frontend
+npm run build
+npm run e2e:serve &          # static server with SPA fallback on :4200
+```
+
+Then run the specs. Browser system libraries need root, so the official image is the reliable
+route:
+
+```bash
+docker run --rm --network host --ipc=host \
+  -v "$PWD:/work" -w /work \
+  -e PLAYWRIGHT_BROWSERS_PATH=/ms-playwright -e HOME=/tmp \
+  mcr.microsoft.com/playwright:v1.63.0-noble npx playwright test
+```
+
+With the libraries installed locally, `npx playwright install --with-deps chromium && npm run e2e`
+does the same thing.
+
 ## Running checks
 
 ```bash

@@ -1,0 +1,69 @@
+<app-page-header title="Reporting periods" subtitle="When organizations report">
+  <button matButton="filled" (click)="openCreate()">
+    <mat-icon>add</mat-icon>
+    New period
+  </button>
+</app-page-header>
+
+<mat-button-toggle-group
+  class="filters"
+  [ngModel]="statusFilter()"
+  (ngModelChange)="statusFilter.set($event); applyFilter()"
+>
+  <mat-button-toggle value="ALL">All</mat-button-toggle>
+  <mat-button-toggle value="DRAFT">Draft</mat-button-toggle>
+  <mat-button-toggle value="OPEN">Open</mat-button-toggle>
+  <mat-button-toggle value="CLOSED">Closed</mat-button-toggle>
+</mat-button-toggle-group>
+
+@if (facade.periods().length === 0 && !facade.loading()) {
+  <app-empty-state icon="event" message="No reporting periods yet." />
+} @else {
+  <table mat-table [dataSource]="facade.periods()" class="table">
+    <ng-container matColumnDef="code">
+      <th mat-header-cell *matHeaderCellDef>Code</th>
+      <td mat-cell *matCellDef="let period">
+        <strong>{{ period.code }}</strong>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef>Type</th>
+      <td mat-cell *matCellDef="let period">{{ period.periodType }}</td>
+    </ng-container>
+    <ng-container matColumnDef="dates">
+      <th mat-header-cell *matHeaderCellDef>Dates</th>
+      <td mat-cell *matCellDef="let period">{{ period.startsOn }} → {{ period.endsOn }}</td>
+    </ng-container>
+    <ng-container matColumnDef="deadline">
+      <th mat-header-cell *matHeaderCellDef>Deadline</th>
+      <td mat-cell *matCellDef="let period">{{ period.submissionDeadline }}</td>
+    </ng-container>
+    <ng-container matColumnDef="scope">
+      <th mat-header-cell *matHeaderCellDef>Scope</th>
+      <td mat-cell *matCellDef="let period">
+        {{ period.metricCount }} metrics · {{ period.participantCount }} orgs
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let period"><app-status-chip [status]="period.status" /></td>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
+      <td mat-cell *matCellDef="let period" class="actions-column">
+        <a matButton [routerLink]="[period.id]">Manage</a>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  <mat-paginator
+    [length]="facade.total()"
+    [pageIndex]="page()"
+    [pageSize]="size()"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="changePage($event)"
+  />
+}

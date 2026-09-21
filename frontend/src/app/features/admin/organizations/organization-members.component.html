@@ -1,0 +1,57 @@
+<app-page-header
+  [title]="organization()?.name ?? 'Members'"
+  [subtitle]="organization()?.code ?? ''"
+>
+  <a matButton routerLink="/admin/organizations">
+    <mat-icon>arrow_back</mat-icon>
+    All organizations
+  </a>
+</app-page-header>
+
+@if (organization()?.status === 'ARCHIVED') {
+  <p class="notice">
+    This organization is archived. Members can be removed but no new members can be added.
+  </p>
+}
+
+<mat-form-field class="picker" subscriptSizing="dynamic">
+  <mat-label>Add a member</mat-label>
+  <input
+    matInput
+    [formControl]="searchControl"
+    [matAutocomplete]="auto"
+    placeholder="Search by username or name"
+  />
+  <mat-icon matSuffix>person_search</mat-icon>
+  <mat-hint>Users appear here once they have signed in at least once.</mat-hint>
+</mat-form-field>
+
+<mat-autocomplete #auto="matAutocomplete">
+  @for (candidate of candidates(); track candidate.id) {
+    <mat-option [value]="candidate.username" (onSelectionChange)="add(candidate)">
+      {{ candidate.displayName }} ({{ candidate.username }})
+    </mat-option>
+  }
+</mat-autocomplete>
+
+@if (facade.members().length === 0) {
+  <app-empty-state icon="group" message="No members yet." />
+} @else {
+  <mat-list class="members">
+    @for (member of facade.members(); track member.userId) {
+      <mat-list-item>
+        <mat-icon matListItemIcon>person</mat-icon>
+        <span matListItemTitle>{{ member.displayName }}</span>
+        <span matListItemLine>{{ member.username }}</span>
+        <button
+          matIconButton
+          matListItemMeta
+          (click)="remove(member.userId, member.displayName)"
+          matTooltip="Remove member"
+        >
+          <mat-icon>person_remove</mat-icon>
+        </button>
+      </mat-list-item>
+    }
+  </mat-list>
+}

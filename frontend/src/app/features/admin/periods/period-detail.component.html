@@ -1,0 +1,100 @@
+@if (period(); as period) {
+  <app-page-header [title]="period.code" [subtitle]="period.startsOn + ' → ' + period.endsOn">
+    <a matButton routerLink="/admin/periods">
+      <mat-icon>arrow_back</mat-icon>
+      All periods
+    </a>
+    @if (period.status === 'DRAFT') {
+      <button matButton="filled" (click)="open()" [disabled]="!canOpen()">Open period</button>
+    }
+    @if (period.status === 'OPEN') {
+      <button matButton="filled" (click)="close()">Close period</button>
+    }
+  </app-page-header>
+
+  <div class="summary">
+    <app-status-chip [status]="period.status" />
+    <span>Deadline {{ period.submissionDeadline }}</span>
+    <span>{{ period.metricCount }} metrics</span>
+    <span>{{ period.participantCount }} organizations</span>
+  </div>
+
+  @if (!isDraft()) {
+    <p class="notice">
+      <mat-icon>lock</mat-icon>
+      Both scopes were frozen when this period opened. Historical figures depend on them staying
+      fixed.
+    </p>
+  } @else if (!canOpen()) {
+    <p class="notice">
+      A period needs at least one metric and one organization before it can be opened.
+    </p>
+  }
+
+  <div class="scopes">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Metric scope</mat-card-title>
+        <mat-card-subtitle>What is collected</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list class="scope-list">
+          @for (metric of availableMetrics(); track metric.id) {
+            <mat-list-item>
+              <mat-checkbox
+                [checked]="selectedMetricIds().has(metric.id)"
+                [disabled]="!isDraft()"
+                (change)="toggleMetric(metric.id, $event.checked)"
+              >
+                <strong>{{ metric.code }}</strong> — {{ metric.name }}
+              </mat-checkbox>
+              @if (selectedMetricIds().has(metric.id)) {
+                <mat-checkbox
+                  matListItemMeta
+                  [checked]="requiredMetricIds().has(metric.id)"
+                  [disabled]="!isDraft()"
+                  (change)="toggle(requiredMetricIds, metric.id, $event.checked)"
+                  matTooltip="Required for submission"
+                >
+                  Required
+                </mat-checkbox>
+              }
+            </mat-list-item>
+          }
+        </mat-list>
+      </mat-card-content>
+      @if (isDraft()) {
+        <mat-card-actions align="end">
+          <button matButton="filled" (click)="saveMetricScope()">Save metric scope</button>
+        </mat-card-actions>
+      }
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Participating organizations</mat-card-title>
+        <mat-card-subtitle>Who must report</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list class="scope-list">
+          @for (organization of availableOrganizations(); track organization.id) {
+            <mat-list-item>
+              <mat-checkbox
+                [checked]="selectedOrganizationIds().has(organization.id)"
+                [disabled]="!isDraft()"
+                (change)="toggle(selectedOrganizationIds, organization.id, $event.checked)"
+              >
+                <strong>{{ organization.code }}</strong> — {{ organization.name }}
+              </mat-checkbox>
+            </mat-list-item>
+          }
+        </mat-list>
+      </mat-card-content>
+      @if (isDraft()) {
+        <mat-card-actions align="end">
+          <button matButton="filled" (click)="saveParticipants()">Save organizations</button>
+        </mat-card-actions>
+      }
+    </mat-card>
+  </div>
+}

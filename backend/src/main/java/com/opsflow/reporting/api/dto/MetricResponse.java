@@ -2,20 +2,22 @@
 package com.opsflow.reporting.api.dto;
 
 import com.opsflow.reporting.domain.MetricView;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public record MetricResponse(
-        UUID id,
-        String code,
-        String name,
+        @Schema(requiredMode = RequiredMode.REQUIRED) UUID id,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String code,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String name,
         String description,
-        String unit,
-        String valueType,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String unit,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String valueType,
         BigDecimal minValue,
         BigDecimal maxValue,
-        boolean active,
-        long version) {
+        @Schema(requiredMode = RequiredMode.REQUIRED) boolean active,
+        @Schema(requiredMode = RequiredMode.REQUIRED) long version) {
 
     public static MetricResponse from(MetricView view) {
         return new MetricResponse(

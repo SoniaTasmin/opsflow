@@ -24,6 +24,7 @@ import jakarta.validation.constraints.Min;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/organizations")
+@RequestMapping(path = "/api/v1/organizations", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 @Tag(name = "Organizations", description = "Organizations and their membership")
 public class OrganizationController {
@@ -57,6 +58,7 @@ public class OrganizationController {
 
     @GetMapping
     @Operation(
+            operationId = "listOrganizations",
             summary = "List organizations",
             description = "Administrators and reviewers see every organization; everyone else sees only "
                     + "the organizations they belong to.")
@@ -74,14 +76,14 @@ public class OrganizationController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get one organization")
+    @Operation(operationId = "getOrganization", summary = "Get one organization")
     public OrganizationResponse get(@PathVariable UUID id) {
         return OrganizationResponse.from(queries.requireVisible(currentActor.requireActor(), OrganizationId.of(id)));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create an organization")
+    @Operation(operationId = "createOrganization", summary = "Create an organization")
     public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody CreateOrganizationRequest request) {
         OrganizationResponse created =
                 OrganizationResponse.from(commands.create(new OrganizationCode(request.code()), request.name()));
@@ -91,7 +93,10 @@ public class OrganizationController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Rename an organization", description = "The code cannot be changed.")
+    @Operation(
+            operationId = "renameOrganization",
+            summary = "Rename an organization",
+            description = "The code cannot be changed.")
     public OrganizationResponse rename(@PathVariable UUID id, @Valid @RequestBody UpdateOrganizationRequest request) {
         return OrganizationResponse.from(commands.rename(OrganizationId.of(id), request.name(), request.version()));
     }
@@ -99,6 +104,7 @@ public class OrganizationController {
     @PostMapping("/{id}/archive")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
+            operationId = "archiveOrganization",
             summary = "Archive an organization",
             description = "Stops future participation and leaves history intact. There is no delete.")
     public OrganizationResponse archive(@PathVariable UUID id, @Valid @RequestBody VersionedRequest request) {
@@ -106,7 +112,7 @@ public class OrganizationController {
     }
 
     @GetMapping("/{id}/members")
-    @Operation(summary = "List the members of an organization")
+    @Operation(operationId = "listMembers", summary = "List the members of an organization")
     public List<MemberResponse> members(@PathVariable UUID id) {
         return queries.membersOf(currentActor.requireActor(), OrganizationId.of(id)).stream()
                 .map(MemberResponse::from)
@@ -116,6 +122,7 @@ public class OrganizationController {
     @PutMapping("/{id}/members/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
+            operationId = "addMember",
             summary = "Add a member",
             description = "Idempotent. Returns 201 when the membership was created, 204 when it already existed.")
     public ResponseEntity<Void> addMember(@PathVariable UUID id, @PathVariable UUID userId) {
@@ -127,7 +134,10 @@ public class OrganizationController {
 
     @DeleteMapping("/{id}/members/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Remove a member", description = "Idempotent, and permitted on an archived organization.")
+    @Operation(
+            operationId = "removeMember",
+            summary = "Remove a member",
+            description = "Idempotent, and permitted on an archived organization.")
     public ResponseEntity<Void> removeMember(@PathVariable UUID id, @PathVariable UUID userId) {
         commands.removeMember(OrganizationId.of(id), UserId.of(userId));
         return ResponseEntity.noContent().build();

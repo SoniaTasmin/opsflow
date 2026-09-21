@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/periods")
+@RequestMapping(path = "/api/v1/periods", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 @Tag(name = "Reporting periods", description = "Reporting periods and their scope")
 public class PeriodController {
@@ -58,7 +59,7 @@ public class PeriodController {
     }
 
     @GetMapping
-    @Operation(summary = "List reporting periods")
+    @Operation(operationId = "listPeriods", summary = "List reporting periods")
     public PageResponse<PeriodResponse> list(
             @RequestParam(required = false) PeriodStatus status,
             @RequestParam(required = false) PeriodType type,
@@ -71,7 +72,7 @@ public class PeriodController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get one period with its metric and organization scope")
+    @Operation(operationId = "getPeriod", summary = "Get one period with its metric and organization scope")
     public PeriodDetailResponse get(@PathVariable UUID id) {
         PeriodId periodId = PeriodId.of(id);
         return new PeriodDetailResponse(
@@ -86,7 +87,7 @@ public class PeriodController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create a reporting period")
+    @Operation(operationId = "createPeriod", summary = "Create a reporting period")
     public ResponseEntity<PeriodResponse> create(@Valid @RequestBody CreatePeriodRequest request) {
         PeriodResponse created = PeriodResponse.from(commands.create(
                 new PeriodCode(request.code()),
@@ -100,7 +101,7 @@ public class PeriodController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Reschedule a draft period")
+    @Operation(operationId = "reschedulePeriod", summary = "Reschedule a draft period")
     public PeriodResponse reschedule(@PathVariable UUID id, @Valid @RequestBody ReschedulePeriodRequest request) {
         return PeriodResponse.from(commands.reschedule(
                 PeriodId.of(id),
@@ -112,7 +113,10 @@ public class PeriodController {
 
     @PutMapping("/{id}/metrics")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Set the metric scope", description = "Draft periods only; the scope freezes on open.")
+    @Operation(
+            operationId = "setPeriodMetricScope",
+            summary = "Set the metric scope",
+            description = "Draft periods only; the scope freezes on open.")
     public PeriodResponse setMetricScope(@PathVariable UUID id, @Valid @RequestBody SetMetricScopeRequest request) {
         List<PeriodCommandService.MetricScopeEntry> entries = request.metrics().stream()
                 .map(entry -> new PeriodCommandService.MetricScopeEntry(
@@ -124,6 +128,7 @@ public class PeriodController {
     @PutMapping("/{id}/organizations")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
+            operationId = "setPeriodParticipants",
             summary = "Set the participating organizations",
             description = "Draft periods only; participation freezes on open.")
     public PeriodResponse setParticipants(@PathVariable UUID id, @Valid @RequestBody SetParticipantsRequest request) {
@@ -135,14 +140,17 @@ public class PeriodController {
 
     @PostMapping("/{id}/open")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Open a period", description = "Requires both scopes to be non-empty, and freezes them.")
+    @Operation(
+            operationId = "openPeriod",
+            summary = "Open a period",
+            description = "Requires both scopes to be non-empty, and freezes them.")
     public PeriodResponse open(@PathVariable UUID id, @Valid @RequestBody VersionedRequest request) {
         return PeriodResponse.from(commands.open(PeriodId.of(id), request.version()));
     }
 
     @PostMapping("/{id}/close")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Close a period")
+    @Operation(operationId = "closePeriod", summary = "Close a period")
     public PeriodResponse close(@PathVariable UUID id, @Valid @RequestBody VersionedRequest request) {
         return PeriodResponse.from(commands.close(PeriodId.of(id), request.version()));
     }
