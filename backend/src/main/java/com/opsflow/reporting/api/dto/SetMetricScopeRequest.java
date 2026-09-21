@@ -8,7 +8,10 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.UUID;
 
-public record SetMetricScopeRequest(@NotEmpty @Valid List<Entry> metrics, @PositiveOrZero long version) {
+public record SetMetricScopeRequest(@NotEmpty @Valid List<MetricScopeEntry> metrics, @PositiveOrZero long version) {
 
-    public record Entry(@NotNull UUID metricId, boolean required, @PositiveOrZero int displayOrder) {}
+    // Named rather than left as a generic "Entry": the OpenAPI schema is keyed by the simple
+    // name, so two nested Entry records in different requests would collapse into one schema
+    // and the generated client would type one of them wrongly.
+    public record MetricScopeEntry(@NotNull UUID metricId, boolean required, @PositiveOrZero int displayOrder) {}
 }

@@ -6,9 +6,11 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M5 of 10 complete.** There is a working application: sign in through Keycloak and
-> administer organizations, members, metrics and reporting periods in the browser. Submissions
-> start at M6. See [the roadmap](#roadmap) for what does and does not exist.
+> **Status: M6 of 10 complete.** There is a working application: sign in through Keycloak,
+> administer organizations, members, metrics and reporting periods, and run a submission through
+> its full review loop in the browser — draft, submit, claim, return with a reason, correct,
+> resubmit, approve. CSV import starts at M7. See [the roadmap](#roadmap) for what does and does
+> not exist.
 
 ## Why this project is interesting
 
@@ -97,7 +99,7 @@ back-edge.
 | M3 | Organizations and membership | ✅ Complete |
 | M4 | Metric catalogue and reporting periods | ✅ Complete |
 | M5 | Angular shell, authentication, admin screens | ✅ Complete |
-| M6 | Submissions and the review workflow | Not started |
+| M6 | Submissions and the review workflow | ✅ Complete |
 | M7 | CSV import with Spring Batch | Not started |
 | M8 | Period summary | Not started |
 | M9 | Demo stack, complete CI, documentation | Not started |

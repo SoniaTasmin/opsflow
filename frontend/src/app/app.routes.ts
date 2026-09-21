@@ -12,6 +12,19 @@ export const routes: Routes = [
       import('./features/home/home-page.component').then((m) => m.HomePageComponent),
   },
   {
+    path: 'submissions',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/submissions/submissions.routes').then((m) => m.submissionRoutes),
+  },
+  {
+    path: 'review',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['REVIEWER', 'ADMIN'] },
+    loadComponent: () =>
+      import('./features/submissions/review-queue.component').then((m) => m.ReviewQueueComponent),
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] },

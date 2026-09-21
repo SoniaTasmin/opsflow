@@ -30,7 +30,8 @@ class CrossModuleSqlRulesTest {
                             "metric_definition",
                             "reporting_period",
                             "reporting_period_metric",
-                            "reporting_period_organization"));
+                            "reporting_period_organization"),
+            "submission", List.of("submission", "submission_value", "submission_transition"));
 
     @Test
     void noModuleQueriesAnotherModulesTables() throws IOException {

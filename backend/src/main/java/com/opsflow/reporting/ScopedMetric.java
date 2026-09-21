@@ -10,4 +10,10 @@ public record ScopedMetric(
         ValueType valueType,
         NumericRange range,
         boolean required,
-        int displayOrder) {}
+        int displayOrder) {
+
+    /** What a value must actually satisfy: the declared range narrowed by the type's own bounds. */
+    public NumericRange acceptedRange() {
+        return range.intersect(valueType.impliedRange());
+    }
+}
