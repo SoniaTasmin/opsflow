@@ -42,6 +42,7 @@ public enum ErrorCode {
     // --- 409: state and concurrency conflicts -------------------------------
     VERSION_CONFLICT(409, "Version conflict"),
     INVALID_STATE_TRANSITION(409, "Invalid state transition"),
+    PERIOD_OVERLAP(409, "Overlapping reporting period"),
     DUPLICATE_RESOURCE(409, "Duplicate resource"),
 
     // --- 422: well formed, but a business rule rejects it --------------------
