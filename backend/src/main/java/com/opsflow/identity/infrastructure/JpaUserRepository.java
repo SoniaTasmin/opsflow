@@ -6,11 +6,16 @@ import com.opsflow.identity.domain.DuplicateExternalIdentityException;
 import com.opsflow.identity.domain.ExternalIdentity;
 import com.opsflow.identity.domain.User;
 import com.opsflow.identity.domain.UserRepository;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 /** Adapts the domain's {@link UserRepository} to Spring Data JPA. */
@@ -18,9 +23,11 @@ import org.springframework.stereotype.Repository;
 class JpaUserRepository implements UserRepository {
 
     private final AppUserJpaRepository jpa;
+    private final JdbcClient jdbc;
 
-    JpaUserRepository(AppUserJpaRepository jpa) {
+    JpaUserRepository(AppUserJpaRepository jpa, JdbcClient jdbc) {
         this.jpa = jpa;
+        this.jdbc = jdbc;
     }
 
     @Override
@@ -50,6 +57,51 @@ class JpaUserRepository implements UserRepository {
         } catch (DataIntegrityViolationException ex) {
             throw new DuplicateExternalIdentityException(user.externalIdentity(), ex);
         }
+    }
+
+    @Override
+    public UserPage search(String term, int page, int size) {
+        boolean hasTerm = term != null && !term.isBlank();
+        String where = hasTerm ? " WHERE lower(u.username) LIKE :term OR lower(u.display_name) LIKE :term" : "";
+
+        var content = jdbc.sql(
+                """
+                SELECT u.id, u.oidc_issuer, u.oidc_subject, u.username, u.display_name, u.email,
+                       u.first_seen_at, u.last_seen_at
+                  FROM opsflow.app_user u
+                """
+                        + where
+                        // Username is not unique, so it alone is not a stable sort key.
+                        + " ORDER BY lower(u.username), u.id LIMIT :limit OFFSET :offset");
+        var count = jdbc.sql("SELECT count(*) FROM opsflow.app_user u" + where);
+
+        if (hasTerm) {
+            String pattern = "%" + term.toLowerCase() + "%";
+            content.param("term", pattern);
+            count.param("term", pattern);
+        }
+
+        List<User> rows = content.param("limit", size)
+                .param("offset", (long) page * size)
+                .query(JpaUserRepository::toDomain)
+                .list();
+        return new UserPage(rows, count.query(Long.class).single());
+    }
+
+    private static Instant toInstant(OffsetDateTime value) {
+        return value == null ? null : value.toInstant();
+    }
+
+    private static User toDomain(ResultSet rs, int rowNum) throws SQLException {
+        return User.rehydrate(
+                UserId.of(rs.getObject("id", UUID.class)),
+                new com.opsflow.identity.domain.ExternalIdentity(
+                        rs.getString("oidc_issuer"), rs.getString("oidc_subject")),
+                rs.getString("username"),
+                rs.getString("display_name"),
+                rs.getString("email"),
+                toInstant(rs.getObject("first_seen_at", OffsetDateTime.class)),
+                toInstant(rs.getObject("last_seen_at", OffsetDateTime.class)));
     }
 
     @Override
