@@ -18,6 +18,12 @@ export const routes: Routes = [
       import('./features/submissions/submissions.routes').then((m) => m.submissionRoutes),
   },
   {
+    path: 'imports',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['USER', 'ADMIN'] },
+    loadChildren: () => import('./features/imports/imports.routes').then((m) => m.importRoutes),
+  },
+  {
     path: 'review',
     canActivate: [authGuard, roleGuard],
     data: { roles: ['REVIEWER', 'ADMIN'] },

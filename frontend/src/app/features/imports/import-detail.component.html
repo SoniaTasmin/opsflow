@@ -1,0 +1,106 @@
+@if (job(); as import) {
+  <app-page-header [title]="import.originalFilename" subtitle="CSV import">
+    <a matButton routerLink="/imports">Back to imports</a>
+  </app-page-header>
+
+  <div class="status-bar">
+    <app-status-chip [status]="import.status" />
+    @if (polling()) {
+      <span class="meta">Refreshing while it runs…</span>
+    }
+    @if (import.finishedAt) {
+      <span class="meta">Finished {{ import.finishedAt | date: 'medium' }}</span>
+    }
+  </div>
+
+  @if (running()) {
+    <mat-progress-bar mode="determinate" [value]="progress()" />
+  }
+
+  @if (import.failureCode) {
+    <mat-card appearance="outlined" class="failure" data-testid="import-failure">
+      <mat-card-content>
+        <mat-icon>{{ interrupted() ? 'restart_alt' : 'error_outline' }}</mat-icon>
+        <div>
+          <strong>{{
+            interrupted() ? 'Interrupted, not finished' : 'This import did not finish'
+          }}</strong>
+          <p>{{ import.failureMessage }}</p>
+          @if (interrupted()) {
+            <p class="hint">
+              The rows already applied stand. Upload the file again to apply the rest — applying the
+              same values twice changes nothing.
+            </p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <div class="counters">
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <span class="label">Rows in file</span>
+        <span class="value">{{ import.submittedRows | number }}</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <span class="label">Processed</span>
+        <span class="value">{{ import.processedRows | number }}</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <span class="label">Applied</span>
+        <span class="value applied" data-testid="valid-rows">{{ import.validRows | number }}</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <span class="label">Rejected</span>
+        <span class="value rejected" data-testid="invalid-rows">
+          {{ import.invalidRows | number }}
+        </span>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Rows that could not be applied</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (facade.errors().length === 0) {
+        <app-empty-state
+          icon="check_circle"
+          [message]="running() ? 'Still running.' : 'Every row was applied.'"
+        />
+      } @else {
+        <table mat-table [dataSource]="facade.errors()" class="table" data-testid="import-errors">
+          <ng-container matColumnDef="row">
+            <th mat-header-cell *matHeaderCellDef>Line</th>
+            <td mat-cell *matCellDef="let error">{{ error.rowNumber }}</td>
+          </ng-container>
+          <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef>Problem</th>
+            <td mat-cell *matCellDef="let error">
+              <code>{{ error.code }}</code>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="message">
+            <th mat-header-cell *matHeaderCellDef>Detail</th>
+            <td mat-cell *matCellDef="let error">{{ error.message }}</td>
+          </ng-container>
+          <ng-container matColumnDef="affected">
+            <th mat-header-cell *matHeaderCellDef>Rows</th>
+            <td mat-cell *matCellDef="let error">{{ error.affectedRows }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="errorColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: errorColumns"></tr>
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+}

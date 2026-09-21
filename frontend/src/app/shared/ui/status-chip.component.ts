@@ -25,6 +25,10 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       background: #ececec;
       color: #6b7280;
     }
+    .chip--negative {
+      background: #fbdede;
+      color: #8a1c1c;
+    }
   `,
 })
 export class StatusChipComponent {
@@ -34,10 +38,13 @@ export class StatusChipComponent {
     switch (this.status()) {
       case 'ACTIVE':
       case 'OPEN':
+      case 'COMPLETED':
         return 'positive';
       case 'ARCHIVED':
       case 'CLOSED':
         return 'muted';
+      case 'FAILED':
+        return 'negative';
       default:
         return 'neutral';
     }

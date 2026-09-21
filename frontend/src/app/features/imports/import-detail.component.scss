@@ -1,0 +1,71 @@
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.meta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.failure {
+  margin: 1rem 0;
+}
+
+.failure mat-card-content {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.failure p {
+  margin: 0.25rem 0 0;
+}
+
+.hint {
+  opacity: 0.75;
+  font-size: 0.85rem;
+}
+
+.counters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.counters mat-card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.applied {
+  color: #14532d;
+}
+
+.rejected {
+  color: #8a1c1c;
+}
+
+.table {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .counters {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

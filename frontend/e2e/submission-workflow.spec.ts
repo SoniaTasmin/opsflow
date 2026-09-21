@@ -1,4 +1,6 @@
-import { Browser, Page, expect, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
+
+import { dialogButton, fillField, navigateTo, signIn } from './app';
 
 /**
  * The milestone's acceptance scenario, driven as a real user: an administrator sets a period
@@ -18,45 +20,6 @@ const YEAR = 2100 + (Number(RUN) % 300);
 const STARTS = `1/1/${YEAR}`;
 const ENDS = `1/31/${YEAR}`;
 const DEADLINE = `2/15/${YEAR}`;
-
-async function signIn(browser: Browser, username: string): Promise<Page> {
-  const page = await (await browser.newContext()).newPage();
-  await page.goto('/');
-  await page.waitForURL(/realms\/opsflow/, { timeout: 30_000 });
-  await page.locator('#username').fill(username);
-  await page.locator('#password').fill('password');
-  await page.locator('#kc-login').click();
-  await page.waitForURL((url) => !url.pathname.includes('/realms/'), { timeout: 30_000 });
-  await expect(page.getByRole('heading', { name: 'Welcome' })).toBeVisible();
-  return page;
-}
-
-/** Dialog fields are scoped to the open dialog so a closing one cannot be matched instead. */
-async function fillField(page: Page, label: string, value: string): Promise<void> {
-  await page.getByRole('dialog').getByLabel(label, { exact: true }).fill(value);
-}
-
-function dialogButton(page: Page, name: string) {
-  return page.getByRole('dialog').getByRole('button', { name, exact: true });
-}
-
-/**
- * Tokens live in memory, so a full page load lands the user back on the home screen after a
- * silent re-authentication. Every navigation therefore goes through the shell's own links.
- */
-const NAV: Record<string, string> = {
-  Organizations: '/admin/organizations',
-  Metrics: '/admin/metrics',
-  'Reporting periods': '/admin/periods',
-  Submissions: '/submissions',
-  'Review queue': '/review',
-};
-
-async function navigateTo(page: Page, label: string): Promise<void> {
-  // The nav link's accessible name carries the Material icon ligature as well as the label.
-  await page.getByRole('link', { name: new RegExp(`${label}$`) }).click();
-  await page.waitForURL(new RegExp(`${NAV[label]}$`), { timeout: 15_000 });
-}
 
 async function openSubmission(page: Page, navLabel: string, rowPattern: RegExp): Promise<void> {
   await navigateTo(page, navLabel);

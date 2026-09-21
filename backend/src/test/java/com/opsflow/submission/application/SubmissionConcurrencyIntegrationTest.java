@@ -148,9 +148,16 @@ class SubmissionConcurrencyIntegrationTest {
     void aStaleVersionLosesRatherThanOverwritingSilently() throws Exception {
         Submission stored = inTransaction(() -> submissions.insert(newSubmission(), author));
 
+        // Both readers take the same version before either writes. Re-reading inside the threads
+        // would let one of them legitimately win twice, which is the race this must not depend on.
+        Submission asOneAuthorSeesIt =
+                inTransaction(() -> submissions.findById(stored.id()).orElseThrow());
+        Submission asAnotherSeesIt =
+                inTransaction(() -> submissions.findById(stored.id()).orElseThrow());
+
         List<Object> outcomes = inParallel(
-                () -> inTransaction(() -> saveValue(stored.id(), "1")),
-                () -> inTransaction(() -> saveValue(stored.id(), "2")));
+                () -> inTransaction(() -> saveValue(asOneAuthorSeesIt, "1")),
+                () -> inTransaction(() -> saveValue(asAnotherSeesIt, "2")));
 
         assertThat(outcomes).filteredOn(Submission.class::isInstance).hasSize(1);
         assertThat(outcomes)
@@ -162,8 +169,7 @@ class SubmissionConcurrencyIntegrationTest {
                 .isEqualTo(1L);
     }
 
-    private Submission saveValue(SubmissionId id, String value) {
-        Submission submission = submissions.findById(id).orElseThrow();
+    private Submission saveValue(Submission submission, String value) {
         submission.setValue(headcount, new BigDecimal(value), null, ValueSource.MANUAL, policy());
         return submissions.update(submission, submission.version(), author);
     }

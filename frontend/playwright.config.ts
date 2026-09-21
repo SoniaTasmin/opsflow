@@ -14,5 +14,8 @@ export default defineConfig({
     baseURL: process.env.OPSFLOW_UI_URL ?? 'http://localhost:4200',
     trace: 'retain-on-failure',
   },
+  // One worker: every spec drives the same stack, so parallel runs contend for the same
+  // Keycloak login flow and create data the others can trip over.
+  workers: 1,
   reporter: [['list']],
 });

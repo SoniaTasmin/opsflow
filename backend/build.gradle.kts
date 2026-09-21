@@ -27,6 +27,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     // Spring Boot 4 no longer auto-configures Flyway from the bare dependency.
     implementation("org.springframework.boot:spring-boot-starter-flyway")
+    implementation("org.springframework.boot:spring-boot-starter-batch")
+    // Batch 6 defaults to an in-memory job repository. Without this starter there is no
+    // persisted execution metadata at all, and nothing to recover after a restart.
+    implementation("org.springframework.boot:spring-boot-starter-batch-jdbc")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
 
@@ -41,6 +45,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
+    testImplementation("org.springframework.batch:spring-batch-test")
     testImplementation(libs.archunit)
 }
 

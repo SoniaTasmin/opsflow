@@ -1,6 +1,9 @@
 export * from './identity.service';
 import { IdentityService } from './identity.service';
 export * from './identity.serviceInterface';
+export * from './imports.service';
+import { ImportsService } from './imports.service';
+export * from './imports.serviceInterface';
 export * from './metrics.service';
 import { MetricsService } from './metrics.service';
 export * from './metrics.serviceInterface';
@@ -18,6 +21,7 @@ import { UsersService } from './users.service';
 export * from './users.serviceInterface';
 export const APIS = [
   IdentityService,
+  ImportsService,
   MetricsService,
   OrganizationsService,
   ReportingPeriodsService,

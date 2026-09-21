@@ -6,11 +6,12 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M6 of 10 complete.** There is a working application: sign in through Keycloak,
-> administer organizations, members, metrics and reporting periods, and run a submission through
-> its full review loop in the browser — draft, submit, claim, return with a reason, correct,
-> resubmit, approve. CSV import starts at M7. See [the roadmap](#roadmap) for what does and does
-> not exist.
+> **Status: M7 of 10 complete.** There is a working application: sign in through Keycloak,
+> administer organizations, members, metrics and reporting periods, run a submission through its
+> full review loop in the browser — draft, submit, claim, return with a reason, correct, resubmit,
+> approve — and bulk-load values from a CSV, which applies them through the same aggregate and
+> reports every row it could not. The period summary starts at M8. See [the roadmap](#roadmap)
+> for what does and does not exist.
 
 ## Why this project is interesting
 
@@ -100,7 +101,7 @@ back-edge.
 | M4 | Metric catalogue and reporting periods | ✅ Complete |
 | M5 | Angular shell, authentication, admin screens | ✅ Complete |
 | M6 | Submissions and the review workflow | ✅ Complete |
-| M7 | CSV import with Spring Batch | Not started |
+| M7 | CSV import with Spring Batch | ✅ Complete |
 | M8 | Period summary | Not started |
 | M9 | Demo stack, complete CI, documentation | Not started |
 
@@ -117,7 +118,9 @@ Stated up front, because a design that hides these is not finished:
   timestamp. Value-level before/after changes are not — after approval you can see who last
   touched a value, not what it was before.
 - **Interrupted imports are not resumed automatically.** They are detected at startup, failed with
-  accurate applied-row counts, and the user re-uploads.
+  accurate applied-row counts and shown as interrupted rather than rejected, and the user
+  re-uploads — which is safe, because applying the same values twice converges. Cancelling or
+  manually restarting an import is future work.
 - **A global role revoked mid-import is not honoured.** Membership revocation is.
 - **An organization archived after a period opens** stays in that period's figures.
 

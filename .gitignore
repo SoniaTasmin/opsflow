@@ -1,5 +1,7 @@
 # --- Java / Gradle ---
 backend/build/
+# Uploaded import files kept by the local file store.
+backend/var/
 backend/.gradle/
 backend/bin/
 *.class
