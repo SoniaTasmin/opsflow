@@ -6,10 +6,9 @@ Units report defined metrics on a fixed cadence; a central reviewer approves or 
 submission with a reason; units that live in spreadsheets bulk-upload CSV instead. Built as a
 **modular monolith** — Java 21 / Spring Boot 4 / Angular 22 / PostgreSQL 18 / Keycloak.
 
-> **Status: M3 of 10 complete.** Toolchain, CI, platform foundations, authentication and
-> organizations are in place: you can log in, and an administrator can create organizations and
-> manage who belongs to them. Metrics and reporting periods start at M4. See
-> [the roadmap](#roadmap) for what does and does not exist.
+> **Status: M4 of 10 complete.** An administrator can define metrics, create a reporting period,
+> set its metric and organization scope, and open it. Submissions start at M6 (the Angular shell
+> is M5). See [the roadmap](#roadmap) for what does and does not exist.
 
 ## Why this project is interesting
 
@@ -20,6 +19,9 @@ Once there is something to look at, these are the parts worth reading:
   [ADR-0001](docs/adr/0001-modular-monolith.md).
 - **One writer for submission data.** CSV import goes through the same aggregate and the same
   invariants as manual editing; efficiency comes from grouping work, never from bypassing it.
+- **Scope freezes when a period opens.** Both the metric scope and the participating
+  organizations are fixed at that moment, so a closed period's figures cannot shift later when an
+  organization is created or archived.
 - **Concurrency handled in the database** — a unique constraint on (organization, period), a GiST
   exclusion constraint against overlapping periods, and a partial unique index serializing
   concurrent imports.
@@ -84,7 +86,7 @@ back-edge.
 | M1 | Platform foundations: error contract, correlation IDs, Flyway, Testcontainers | ✅ Complete |
 | M2 | Security and identity: Keycloak, OIDC resource server, user provisioning | ✅ Complete |
 | M3 | Organizations and membership | ✅ Complete |
-| M4 | Metric catalogue and reporting periods | Not started |
+| M4 | Metric catalogue and reporting periods | ✅ Complete |
 | M5 | Angular shell, authentication, admin screens | Not started |
 | M6 | Submissions and the review workflow | Not started |
 | M7 | CSV import with Spring Batch | Not started |
