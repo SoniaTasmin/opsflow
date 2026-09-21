@@ -2,23 +2,25 @@
 package com.opsflow.reporting.api.dto;
 
 import com.opsflow.reporting.domain.PeriodView;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
 public record PeriodResponse(
-        UUID id,
-        String code,
-        String periodType,
-        LocalDate startsOn,
-        LocalDate endsOn,
-        LocalDate submissionDeadline,
-        String status,
+        @Schema(requiredMode = RequiredMode.REQUIRED) UUID id,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String code,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String periodType,
+        @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate startsOn,
+        @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate endsOn,
+        @Schema(requiredMode = RequiredMode.REQUIRED) LocalDate submissionDeadline,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String status,
         Instant openedAt,
         Instant closedAt,
-        int metricCount,
-        int participantCount,
-        long version) {
+        @Schema(requiredMode = RequiredMode.REQUIRED) int metricCount,
+        @Schema(requiredMode = RequiredMode.REQUIRED) int participantCount,
+        @Schema(requiredMode = RequiredMode.REQUIRED) long version) {
 
     public static PeriodResponse from(PeriodView view) {
         return new PeriodResponse(

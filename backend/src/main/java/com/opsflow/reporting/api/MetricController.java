@@ -19,6 +19,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.net.URI;
 import java.util.UUID;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/metrics")
+@RequestMapping(path = "/api/v1/metrics", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 @Tag(name = "Metrics", description = "The metric catalogue")
 public class MetricController {
@@ -46,7 +47,7 @@ public class MetricController {
     }
 
     @GetMapping
-    @Operation(summary = "List metrics")
+    @Operation(operationId = "listMetrics", summary = "List metrics")
     public PageResponse<MetricResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) Boolean active,
@@ -59,14 +60,14 @@ public class MetricController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get one metric")
+    @Operation(operationId = "getMetric", summary = "Get one metric")
     public MetricResponse get(@PathVariable UUID id) {
         return MetricResponse.from(queries.require(MetricId.of(id)));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create a metric")
+    @Operation(operationId = "createMetric", summary = "Create a metric")
     public ResponseEntity<MetricResponse> create(@Valid @RequestBody CreateMetricRequest request) {
         MetricResponse created = MetricResponse.from(commands.create(
                 new MetricCode(request.code()),
@@ -81,7 +82,10 @@ public class MetricController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update a metric", description = "Code and value type cannot be changed.")
+    @Operation(
+            operationId = "updateMetric",
+            summary = "Update a metric",
+            description = "Code and value type cannot be changed.")
     public MetricResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateMetricRequest request) {
         return MetricResponse.from(commands.update(
                 MetricId.of(id),
@@ -94,7 +98,10 @@ public class MetricController {
 
     @PostMapping("/{id}/archive")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Archive a metric", description = "Historical values keep resolving; there is no delete.")
+    @Operation(
+            operationId = "archiveMetric",
+            summary = "Archive a metric",
+            description = "Historical values keep resolving; there is no delete.")
     public MetricResponse archive(@PathVariable UUID id, @Valid @RequestBody VersionedRequest request) {
         return MetricResponse.from(commands.archive(MetricId.of(id), request.version()));
     }

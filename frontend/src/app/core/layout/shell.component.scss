@@ -1,0 +1,59 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar__title {
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.toolbar__spacer {
+  flex: 1 1 auto;
+}
+
+.progress-placeholder {
+  height: 4px;
+}
+
+.layout {
+  height: calc(100vh - 68px);
+}
+
+.layout__nav {
+  width: 15rem;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+}
+
+.layout__content main {
+  padding: 1.5rem;
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.active-link {
+  background: var(--mat-sys-secondary-container);
+}
+
+.account {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.account__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.account__meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@media (max-width: 720px) {
+  .layout__content main {
+    padding: 1rem 0.75rem;
+  }
+}

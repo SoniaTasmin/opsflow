@@ -1,0 +1,86 @@
+<app-page-header title="Organizations" subtitle="The units that report">
+  <button matButton="filled" (click)="openCreate()">
+    <mat-icon>add</mat-icon>
+    New organization
+  </button>
+</app-page-header>
+
+<mat-form-field class="search" subscriptSizing="dynamic">
+  <mat-label>Search</mat-label>
+  <input
+    matInput
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event)"
+    (keyup.enter)="applySearch()"
+    placeholder="Code or name"
+  />
+  <button matIconButton matSuffix (click)="applySearch()" aria-label="Search">
+    <mat-icon>search</mat-icon>
+  </button>
+</mat-form-field>
+
+@if (facade.organizations().length === 0 && !facade.loading()) {
+  <app-empty-state icon="apartment" message="No organizations yet." />
+} @else {
+  <table mat-table [dataSource]="facade.organizations()" class="table">
+    <ng-container matColumnDef="code">
+      <th mat-header-cell *matHeaderCellDef>Code</th>
+      <td mat-cell *matCellDef="let organization">
+        <strong>{{ organization.code }}</strong>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let organization">{{ organization.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let organization">
+        <app-status-chip [status]="organization.status" />
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="members">
+      <th mat-header-cell *matHeaderCellDef>Members</th>
+      <td mat-cell *matCellDef="let organization">{{ organization.memberCount }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
+      <td mat-cell *matCellDef="let organization" class="actions-column">
+        <a matIconButton [routerLink]="[organization.id, 'members']" matTooltip="Manage members">
+          <mat-icon>group</mat-icon>
+        </a>
+        <button
+          matIconButton
+          (click)="openRename(organization)"
+          [disabled]="organization.status !== 'ACTIVE'"
+          matTooltip="Rename"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          matIconButton
+          (click)="archive(organization)"
+          [disabled]="organization.status !== 'ACTIVE'"
+          matTooltip="Archive"
+        >
+          <mat-icon>archive</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  <mat-paginator
+    [length]="facade.total()"
+    [pageIndex]="page()"
+    [pageSize]="size()"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="changePage($event)"
+  />
+}

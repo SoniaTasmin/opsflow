@@ -2,19 +2,21 @@
 package com.opsflow.reporting.api.dto;
 
 import com.opsflow.reporting.ScopedMetric;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ScopedMetricResponse(
-        UUID metricId,
-        String code,
-        String name,
-        String unit,
-        String valueType,
+        @Schema(requiredMode = RequiredMode.REQUIRED) UUID metricId,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String code,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String name,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String unit,
+        @Schema(requiredMode = RequiredMode.REQUIRED) String valueType,
         BigDecimal minValue,
         BigDecimal maxValue,
-        boolean required,
-        int displayOrder) {
+        @Schema(requiredMode = RequiredMode.REQUIRED) boolean required,
+        @Schema(requiredMode = RequiredMode.REQUIRED) int displayOrder) {
 
     public static ScopedMetricResponse from(ScopedMetric metric) {
         return new ScopedMetricResponse(
