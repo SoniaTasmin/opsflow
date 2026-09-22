@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 
-import { dialogButton, fillField, navigateTo, signIn } from './app';
+import { dialogButton, fillField, findRow, navigateTo, signIn } from './app';
 
 /**
  * The milestone's acceptance scenario, driven as a real user: an administrator sets a period
@@ -43,9 +43,7 @@ test('a reporter submits, a reviewer returns it, and the correction is approved'
     await fillField(admin, 'Name', `End-to-end unit ${RUN}`);
     await dialogButton(admin, 'Save').click();
 
-    const row = admin.getByRole('row', { name: new RegExp(ORG_CODE) });
-    await expect(row).toBeVisible();
-    await row.getByRole('link').first().click();
+    await (await findRow(admin, ORG_CODE)).getByRole('link').first().click();
 
     await admin.getByLabel('Add a member').fill('reporter');
     await admin.getByRole('option', { name: /reporter/ }).click();
@@ -60,7 +58,7 @@ test('a reporter submits, a reviewer returns it, and the correction is approved'
     await fillField(admin, 'Name', `Headcount ${RUN}`);
     await fillField(admin, 'Unit', 'people');
     await dialogButton(admin, 'Save').click();
-    await expect(admin.getByText(METRIC_CODE)).toBeVisible();
+    await findRow(admin, METRIC_CODE);
   });
 
   await test.step('the administrator opens a period scoped to that organization', async () => {

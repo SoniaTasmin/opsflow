@@ -5,8 +5,11 @@ import com.opsflow.identity.UserId;
 import com.opsflow.organization.OrganizationId;
 import com.opsflow.reporting.PeriodId;
 import com.opsflow.submission.SubmissionId;
+import com.opsflow.submission.SubmissionStatus;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface SubmissionRepository {
 
@@ -27,6 +30,8 @@ public interface SubmissionRepository {
     List<SubmissionValue> valuesOf(SubmissionId id);
 
     List<StatusTransition> historyOf(SubmissionId id);
+
+    Map<SubmissionStatus, Integer> countByStatus(PeriodId reportingPeriodId, Set<OrganizationId> organizationIds);
 
     record SubmissionPage(List<SubmissionView> content, long totalElements) {}
 }

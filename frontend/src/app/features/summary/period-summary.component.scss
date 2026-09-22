@@ -1,0 +1,94 @@
+.period-picker {
+  width: 22rem;
+  max-width: 100%;
+}
+
+.headline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.code {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.scope {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.completion {
+  margin-bottom: 1rem;
+}
+
+.completion-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.denominator {
+  margin: 0.5rem 0 0;
+  opacity: 0.75;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+}
+
+.tiles mat-card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.count {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.count--positive {
+  color: #14532d;
+}
+
+.count--attention {
+  color: #8a1c1c;
+}
+
+.count--progress {
+  color: #1d4ed8;
+}
+
+.reconciles {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 1100px) {
+  .tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

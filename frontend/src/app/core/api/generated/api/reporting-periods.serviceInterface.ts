@@ -15,6 +15,7 @@ import { CreatePeriodRequest } from '../model/models';
 import { PageResponsePeriodResponse } from '../model/models';
 import { PeriodDetailResponse } from '../model/models';
 import { PeriodResponse } from '../model/models';
+import { PeriodSummaryResponse } from '../model/models';
 import { ReschedulePeriodRequest } from '../model/models';
 import { SetMetricScopeRequest } from '../model/models';
 import { SetParticipantsRequest } from '../model/models';
@@ -57,6 +58,17 @@ export interface ReportingPeriodsServiceInterface {
    * @param id
    */
   getPeriod(id: string, extraHttpRequestParams?: any): Observable<PeriodDetailResponse>;
+
+  /**
+   * How far through a reporting period its participants are
+   * Counted against the period\&#39;s frozen participant set. Reviewers and administrators see every participant; everyone else sees their own organizations, denominator included.
+   * @endpoint get /api/v1/periods/{periodId}/summary
+   * @param periodId
+   */
+  getPeriodSummary(
+    periodId: string,
+    extraHttpRequestParams?: any,
+  ): Observable<PeriodSummaryResponse>;
 
   /**
    * List reporting periods

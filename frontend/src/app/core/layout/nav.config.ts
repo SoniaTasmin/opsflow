@@ -10,6 +10,12 @@ export interface NavItem {
 export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Home', path: '/home', icon: 'home', roles: ['USER', 'REVIEWER', 'ADMIN'] },
   {
+    label: 'Period summary',
+    path: '/summary',
+    icon: 'donut_large',
+    roles: ['USER', 'REVIEWER', 'ADMIN'],
+  },
+  {
     label: 'Submissions',
     path: '/submissions',
     icon: 'assignment',

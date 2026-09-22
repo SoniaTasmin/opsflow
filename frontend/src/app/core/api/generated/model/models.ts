@@ -19,6 +19,7 @@ export * from './page-response-user-response';
 export * from './participant-response';
 export * from './period-detail-response';
 export * from './period-response';
+export * from './period-summary-response';
 export * from './reject-submission-request';
 export * from './reschedule-period-request';
 export * from './save-values-request';

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { dialogButton, fillField, navigateTo, selectOption, signIn } from './app';
+import { dialogButton, fillField, findRow, navigateTo, selectOption, signIn } from './app';
 
 /**
  * CSV import end to end: an administrator prepares a period, a reporter uploads a file with one
@@ -35,11 +35,7 @@ test('a reporter imports a CSV and sees exactly what was applied', async ({ brow
     await fillField(admin, 'Name', `Import unit ${RUN}`);
     await dialogButton(admin, 'Save').click();
 
-    await admin
-      .getByRole('row', { name: new RegExp(ORG_CODE) })
-      .getByRole('link')
-      .first()
-      .click();
+    await (await findRow(admin, ORG_CODE)).getByRole('link').first().click();
     await admin.getByLabel('Add a member').fill('reporter');
     await admin.getByRole('option', { name: /reporter/ }).click();
     await expect(admin.locator('.members').getByText('Ria Reporter')).toBeVisible();
@@ -50,7 +46,7 @@ test('a reporter imports a CSV and sees exactly what was applied', async ({ brow
     await fillField(admin, 'Name', `Imported headcount ${RUN}`);
     await fillField(admin, 'Unit', 'people');
     await dialogButton(admin, 'Save').click();
-    await expect(admin.getByText(METRIC_CODE)).toBeVisible();
+    await findRow(admin, METRIC_CODE);
 
     await navigateTo(admin, 'Reporting periods');
     await admin.getByRole('button', { name: 'New period' }).click();

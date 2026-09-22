@@ -12,6 +12,12 @@ export const routes: Routes = [
       import('./features/home/home-page.component').then((m) => m.HomePageComponent),
   },
   {
+    path: 'summary',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/summary/period-summary.component').then((m) => m.PeriodSummaryComponent),
+  },
+  {
     path: 'submissions',
     canActivate: [authGuard],
     loadChildren: () =>
