@@ -61,19 +61,16 @@ spring:
           # Signature keys are fetched from this issuer's JWKS and cached; there is
           # no introspection call per request.
           issuer-uri: ${OPSFLOW_OIDC_ISSUER_URI:http://localhost:8081/realms/opsflow}
-          # Set explicitly so signing keys are fetched on first use rather than during
-          # startup. Discovery would make a reachable identity provider a precondition
-          # for the application booting at all.
+          # Explicit so keys are fetched on first use: discovery would make a reachable
+          # identity provider a precondition for booting at all.
           jwk-set-uri: ${OPSFLOW_OIDC_JWK_SET_URI:http://localhost:8081/realms/opsflow/protocol/openid-connect/certs}
 
-  # Structured logs as JSON, using Spring Boot's built-in support. MDC entries —
-  # including correlationId — are emitted as fields, so logs are queryable
-  # without a log-parsing regex. Overridden to plain text for local development.
+  # JSON logs with MDC entries as fields, so correlationId is queryable without a regex.
+  # Plain text on the local profile.
   threads:
     virtual:
-      # Off until measured: virtual threads can pin on synchronized blocks and
-      # interact badly with a fixed JDBC pool. Enabling them is a decision to
-      # make with evidence.
+      # Off until measured: they can pin on synchronized blocks and interact badly with a
+      # fixed JDBC pool.
       enabled: false
 
 logging:

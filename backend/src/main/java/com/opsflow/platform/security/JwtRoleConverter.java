@@ -14,16 +14,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
- * Maps Keycloak realm roles onto Spring Security authorities.
- *
- * <p>Only the three roles this application defines are mapped. Keycloak issues roles of its own
- * ({@code offline_access}, {@code uma_authorization}) and a realm may carry roles belonging to
- * other applications; none of them should become authorities here, because an authority this
- * application does not understand is one it cannot reason about.
- *
- * <p>A token carrying no recognised role yields an authenticated principal with no authorities.
- * That is correct: such a user is authenticated but entitled to nothing, and every authorization
- * check fails closed.
+ * Only this application's own roles become authorities; a realm carries others. A token with no
+ * recognised role authenticates with no authorities, so every check fails closed.
  */
 public class JwtRoleConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 

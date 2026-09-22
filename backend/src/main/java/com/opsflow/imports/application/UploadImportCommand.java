@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 /**
  * @param organizationId null when the file may carry rows for several organizations
- * @param originalFilename data only: storage names are generated from the job id
+ * @param originalFilename data only: storage names come from the job id
  */
 public record UploadImportCommand(
         PeriodId reportingPeriodId,

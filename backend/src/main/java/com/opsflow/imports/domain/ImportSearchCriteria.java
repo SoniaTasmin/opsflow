@@ -8,9 +8,8 @@ import com.opsflow.reporting.PeriodId;
 import java.util.Set;
 
 /**
- * @param visibleOrganizations null when the caller may see every import; an empty set means they
- *     may see only their own unscoped ones, which is a different answer
- * @param onlyInitiatedBy set when the caller may see nothing beyond what they started themselves
+ * @param visibleOrganizations null when the caller may see every import; empty is a different
+ *     answer and means only their own
  */
 public record ImportSearchCriteria(
         Set<OrganizationId> visibleOrganizations,

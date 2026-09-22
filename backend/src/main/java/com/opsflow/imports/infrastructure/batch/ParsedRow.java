@@ -5,10 +5,7 @@ import com.opsflow.organization.OrganizationId;
 import com.opsflow.reporting.MetricId;
 import java.math.BigDecimal;
 
-/**
- * A line after the imports module has done what it can: resolved codes and parsed the number.
- * Whether the value is acceptable is the submission module's answer, not this one's.
- */
+/** Codes resolved and the number parsed; whether the value is acceptable is not decided here. */
 record ParsedRow(
         int rowNumber,
         OrganizationId organizationId,

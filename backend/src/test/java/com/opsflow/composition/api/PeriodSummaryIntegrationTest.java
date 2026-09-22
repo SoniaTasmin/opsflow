@@ -127,8 +127,6 @@ class PeriodSummaryIntegrationTest {
         organizationCommands.addMember(alpha, reporterId);
     }
 
-    // ------------------------------------------------------------ counting
-
     @Test
     void theFrozenParticipantSetIsTheDenominatorAndNobodyHasStarted() throws Exception {
         mockMvc.perform(get(summaryPath).with(as(admin())))
@@ -191,8 +189,6 @@ class PeriodSummaryIntegrationTest {
                 .andExpect(jsonPath("$.completionRatio").value(1.0 / 3));
     }
 
-    // ------------------------------------------------------------ frozen scope
-
     @Test
     void anOrganizationCreatedAfterThePeriodOpenedDoesNotAppear() throws Exception {
         submission(alpha, SubmissionStatus.APPROVED);
@@ -214,8 +210,6 @@ class PeriodSummaryIntegrationTest {
                 .andExpect(jsonPath("$.participatingOrganizations").value(3))
                 .andExpect(jsonPath("$.notStarted").value(3));
     }
-
-    // ------------------------------------------------------------ visibility
 
     @Test
     void aReporterSeesOnlyTheirOwnOrganizationInBothCountAndDenominator() throws Exception {
@@ -257,8 +251,6 @@ class PeriodSummaryIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
     }
-
-    // ------------------------------------------------------------ helpers
 
     private void assertReconciles(MvcResult result) throws Exception {
         var body = objectMapper.readTree(result.getResponse().getContentAsString());

@@ -33,12 +33,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-/**
- * Streaming, chunked, and written entirely through the submission module's published port.
- *
- * <p>Each step-scoped bean is rebuilt per execution from the job's own row: the parameters carry
- * identifiers, never a principal.
- */
+/** Step-scoped beans are rebuilt from the job's row: the parameters carry identifiers, never a principal. */
 @Configuration
 class CsvImportJobConfiguration {
 
@@ -80,9 +75,9 @@ class CsvImportJobConfiguration {
                 .processor(rowValidationProcessor)
                 .writer(submissionApplyWriter)
                 .faultTolerant()
-                // An import racing a human edit loses the version check; the answer is to reload
-                // and reapply. Bounded, because a conflict surviving three attempts is not
-                // transient and a validation failure must never be retried at all.
+                // An import racing a human edit loses the version check and should reload.
+                // Bounded: a conflict surviving three attempts is not transient, and a
+                // validation failure must never be retried.
                 .retry(ConflictException.class)
                 .retryLimit(3)
                 .build();
@@ -160,10 +155,7 @@ class CsvImportJobConfiguration {
                 context.correlationId());
     }
 
-    /**
-     * Keeps the job's own record truthful: a step that failed leaves the import FAILED with a
-     * reason the user can read, never COMPLETED.
-     */
+    /** A failed step leaves the import FAILED with a readable reason, never COMPLETED. */
     private static JobExecutionListener outcomeListener(ImportJobLifecycle lifecycle) {
         return new JobExecutionListener() {
             @Override

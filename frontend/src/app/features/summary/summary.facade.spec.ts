@@ -57,11 +57,12 @@ class StubApi {
 
 class StubNotifier {
   readonly errors: ApiError[] = [];
+  readonly successes: string[] = [];
   notify(error: ApiError): void {
     this.errors.push(error);
   }
-  success(): void {
-    // Not used by this facade; present because the notifier is injected whole.
+  success(message: string): void {
+    this.successes.push(message);
   }
 }
 

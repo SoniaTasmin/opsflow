@@ -1,13 +1,9 @@
 /**
- * Seeds the demo dataset through the running application's own HTTP API.
+ * Seeds the demo dataset through the application's own HTTP API under a real Keycloak token, so
+ * the data is by construction data the application would accept. Deterministic on every run.
  *
- * Nothing is inserted into the database directly: every organization, period and submission is
- * created by the same endpoints a user drives, under a real Keycloak token, so the demo data is
- * by construction data the application would accept. It is deterministic — same codes, same
- * dates, same figures on every run.
- *
- * Local only. It authenticates with the realm's development CLI client, which exists for local
- * testing and is not part of any deployed configuration.
+ * Local only: it authenticates with the realm's development CLI client, which no deployed
+ * configuration has.
  */
 
 const API = process.env.OPSFLOW_API_URL ?? "http://localhost:8080";

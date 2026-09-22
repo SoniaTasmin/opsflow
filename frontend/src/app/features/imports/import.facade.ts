@@ -41,7 +41,6 @@ export class ImportFacade {
     }
   }
 
-  /** Refreshes the job and its errors; used by the detail screen's polling as well. */
   async loadDetail(id: string): Promise<ImportJobResponse | null> {
     try {
       const job = await firstValueFrom(this.api.getImport(id));

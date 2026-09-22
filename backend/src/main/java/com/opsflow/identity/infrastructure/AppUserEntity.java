@@ -9,13 +9,7 @@ import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Persistence shape of {@code opsflow.app_user}.
- *
- * <p>Separate from {@link com.opsflow.identity.domain.User} on purpose: this type is shaped by
- * the table, the domain type is shaped by behaviour, and neither should constrain the other.
- * It never leaves the infrastructure package and never appears in an API signature.
- */
+/** Shaped by the table; {@code User} is shaped by behaviour. Never leaves infrastructure. */
 @Entity
 @Table(name = "app_user", schema = "opsflow")
 public class AppUserEntity {

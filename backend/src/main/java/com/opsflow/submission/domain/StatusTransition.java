@@ -5,12 +5,7 @@ import com.opsflow.identity.UserId;
 import com.opsflow.submission.SubmissionStatus;
 import java.time.Instant;
 
-/**
- * One entry in a submission's workflow history.
- *
- * @param from null for the entry recording the submission's creation
- * @param actorId null only when a transition was made outside a request, which no current path does
- */
+/** @param from null for the entry recording the submission's creation */
 public record StatusTransition(
         SubmissionStatus from, SubmissionStatus to, UserId actorId, String reason, Instant occurredAt) {
 

@@ -7,10 +7,7 @@ import com.opsflow.platform.correlation.CorrelationId;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * Rebuilds what a running import needs from its own row. The job parameters carry identifiers
- * only: everything a chunk acts on is read from the database, never from a serialized principal.
- */
+/** Job parameters carry identifiers only; everything else is read from the database. */
 @Component
 class ImportContextFactory {
 

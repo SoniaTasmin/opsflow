@@ -140,8 +140,6 @@ class ReportingApiIntegrationTest {
                 .andExpect(status().isOk());
     }
 
-    // ------------------------------------------------------------ authorization
-
     @Test
     void reportingEndpointsRequireAuthentication() throws Exception {
         mockMvc.perform(get("/api/v1/metrics")).andExpect(status().isUnauthorized());
@@ -178,8 +176,6 @@ class ReportingApiIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
-
-    // ------------------------------------------------------------ uniqueness
 
     @Test
     void duplicateMetricCodesAreRejected() throws Exception {
@@ -243,8 +239,6 @@ class ReportingApiIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
-    // ------------------------------------------------------------ validation
-
     @Test
     void rejectsADeadlineBeforeThePeriodEnds() throws Exception {
         mockMvc.perform(
@@ -272,8 +266,6 @@ class ReportingApiIntegrationTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("PERIOD_DATES_INVALID"));
     }
-
-    // ------------------------------------------------------------ scope rules
 
     @Test
     void anArchivedMetricCannotEnterAPeriodScope() throws Exception {
@@ -504,8 +496,6 @@ class ReportingApiIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(false));
     }
-
-    // ------------------------------------------------------------ concurrency
 
     @Test
     void aStaleVersionLosesOnAPeriod() throws Exception {

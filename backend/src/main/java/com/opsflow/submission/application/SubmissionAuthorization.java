@@ -14,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/**
- * Organization-scoped authorization, which can only be decided once the submission has been
- * loaded and its organization is known. The coarse role gate is declarative on the controller.
- */
+/** Decidable only once the submission is loaded. The coarse role gate is on the controller. */
 @Component
 class SubmissionAuthorization {
 
@@ -35,11 +32,7 @@ class SubmissionAuthorization {
         return currentActor.requireActor();
     }
 
-    /**
-     * A caller who cannot see the owning organization gets the same 404 as one asking about a
-     * submission that does not exist. A 403 would confirm the identifier is real, which is
-     * exactly what enumerating it is meant to discover. The real reason is logged.
-     */
+    /** 404, not 403: a 403 would confirm the identifier is real. The real reason is logged. */
     void requireVisibility(Actor actor, SubmissionId submissionId, OrganizationId organizationId) {
         if (canSeeEverything(actor) || organizations.isMember(actor.userId(), organizationId)) {
             return;

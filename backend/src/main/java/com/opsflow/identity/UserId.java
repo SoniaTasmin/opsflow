@@ -6,12 +6,8 @@ import java.time.Clock;
 import java.util.UUID;
 
 /**
- * The application's own identifier for a person.
- *
- * <p>Deliberately not the OIDC {@code sub}. The specification permits a subject to be any string
- * up to 255 characters, and using it as a primary key hands ownership of every foreign key in the
- * system to an external service — making a change of identity provider a rewrite rather than a
- * configuration change (ADR-0003).
+ * Not the OIDC {@code sub}: keying on that hands ownership of every foreign key to an external
+ * service, and changing provider becomes a rewrite (ADR-0003).
  */
 public record UserId(UUID value) {
 

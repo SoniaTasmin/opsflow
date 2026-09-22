@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-/** The status and counter writes a running import makes, each in its own transaction. */
 @Service
 public class ImportJobLifecycle {
 
@@ -51,10 +50,7 @@ public class ImportJobLifecycle {
         jobs.save(job);
     }
 
-    /**
-     * Written in the chunk's own transaction so counters and applied values commit or roll back
-     * together: a chunk that fails must not leave rows counted as applied.
-     */
+    /** In the chunk's transaction: a chunk that fails must not leave rows counted as applied. */
     @Transactional(propagation = Propagation.MANDATORY)
     public void recordChunk(ImportJobId id, int processed, int valid, int invalid, List<ImportRowError> errors) {
         jobs.recordProgress(id, processed, valid, invalid);

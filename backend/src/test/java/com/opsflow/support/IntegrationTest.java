@@ -11,13 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-/**
- * Marks a test that needs the full application context and a real PostgreSQL.
- *
- * <p>A composed annotation rather than an abstract base class: test classes stay free to extend
- * whatever they need, and there is no inherited behaviour to reason about — consistent with the
- * project's rule against base classes that exist only to share configuration.
- */
+/** A composed annotation rather than a base class, so tests inherit no behaviour to reason about. */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

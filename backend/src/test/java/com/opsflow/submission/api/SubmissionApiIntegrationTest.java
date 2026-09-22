@@ -109,8 +109,6 @@ class SubmissionApiIntegrationTest {
         addMember(beta, otherMemberId);
     }
 
-    // ------------------------------------------------------------ authentication and role gates
-
     @Test
     void everySubmissionEndpointRequiresAuthentication() throws Exception {
         UUID someId = UUID.randomUUID();
@@ -161,8 +159,6 @@ class SubmissionApiIntegrationTest {
         mockMvc.perform(command(submission, "submit", otherMember(), 0)).andExpect(status().isNotFound());
         mockMvc.perform(command(submission, "withdraw", otherMember(), 0)).andExpect(status().isNotFound());
     }
-
-    // ------------------------------------------------------------ the loop
 
     @Test
     void anAuthorDraftsValuesAndSendsThemForReview() throws Exception {
@@ -260,8 +256,6 @@ class SubmissionApiIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
     }
-
-    // ------------------------------------------------------------ rules
 
     @Test
     void refusesToSubmitWhileARequiredMetricHasNoValue() throws Exception {
@@ -398,8 +392,6 @@ class SubmissionApiIntegrationTest {
                 .andExpect(jsonPath("$.values[0].value").value(42));
     }
 
-    // ------------------------------------------------------------ listing
-
     @Test
     void theListShowsOnlyTheCallersOrganizations() throws Exception {
         draft(alpha);
@@ -494,8 +486,6 @@ class SubmissionApiIntegrationTest {
                         .andExpect(status().isOk())
                         .andReturn());
     }
-
-    // ------------------------------------------------------------ helpers
 
     private UUID draft(UUID organizationId) throws Exception {
         return draftFor(author(), organizationId);

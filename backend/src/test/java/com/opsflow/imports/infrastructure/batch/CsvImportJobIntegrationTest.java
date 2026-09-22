@@ -122,8 +122,6 @@ class CsvImportJobIntegrationTest {
         period = openPeriod(List.of(headcount, share), Set.of(alpha, beta));
     }
 
-    // ------------------------------------------------------------ the happy path
-
     @Test
     void appliesValuesThroughTheSubmissionAggregate() {
         ImportJobId job = run(
@@ -171,8 +169,6 @@ class CsvImportJobIntegrationTest {
                 .isEqualTo(1L);
     }
 
-    // ------------------------------------------------------------ authority
-
     /**
      * The job is admitted as a member but the initiator belongs to nothing, which can only be
      * caught while processing: admission is not re-run on a batch thread.
@@ -207,8 +203,6 @@ class CsvImportJobIntegrationTest {
                 .isEqualTo("ORG_NOT_IN_PERIOD_SCOPE"));
         assertThat(submissionCount()).isZero();
     }
-
-    // ------------------------------------------------------------ submission rules
 
     @Test
     void anApprovedSubmissionIsLeftExactlyAsItWas() {
@@ -257,8 +251,6 @@ class CsvImportJobIntegrationTest {
         assertThat(errorsOf(job)).singleElement().satisfies(error -> assertThat(error.code())
                 .isEqualTo("VALUE_OUT_OF_RANGE"));
     }
-
-    // ------------------------------------------------------------ the file itself
 
     @Test
     void aWrongHeaderStopsTheImportBeforeAnyRowIsTouched() {
@@ -337,8 +329,6 @@ class CsvImportJobIntegrationTest {
         assertThat(errorsOf(job)).singleElement().satisfies(error -> assertThat(error.code())
                 .isEqualTo("ORG_OUT_OF_SCOPE"));
     }
-
-    // ------------------------------------------------------------ helpers
 
     private ImportJobId run(String csv, OrganizationId scope, UserId initiator, ImportAuthorizationMode mode) {
         ImportJobId jobId = ImportJobId.generate(CLOCK);

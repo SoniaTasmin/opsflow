@@ -3,8 +3,7 @@ package com.opsflow.imports.domain;
 
 /**
  * @param rowNumber the first affected line, 1-based and counting the header
- * @param affectedRows how many input rows this one error accounts for; greater than 1 when a
- *     rule invalidated a whole organization's rows at once
+ * @param affectedRows above 1 when one rule invalidated a whole organization's rows
  */
 public record ImportRowError(int rowNumber, String code, String message, int affectedRows) {
 

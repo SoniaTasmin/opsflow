@@ -18,7 +18,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-/** Adapts the domain's {@link UserRepository} to Spring Data JPA. */
 @Repository
 class JpaUserRepository implements UserRepository {
 

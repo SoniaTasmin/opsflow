@@ -10,10 +10,7 @@ import com.opsflow.submission.domain.SubmissionView;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Everything the detail screen needs in one read: the submission, who it belongs to, and the
- * period's metric scope — without which the value form cannot be rendered at all.
- */
+/** One read for the detail screen: without the period's metric scope the value form cannot render. */
 public record SubmissionDetail(
         SubmissionView submission,
         OrganizationSummary organization,

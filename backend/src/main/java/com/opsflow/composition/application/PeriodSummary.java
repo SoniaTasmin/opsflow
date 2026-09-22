@@ -8,11 +8,9 @@ import com.opsflow.submission.SubmissionStatus;
 import java.util.Map;
 
 /**
- * @param scope whether the figures cover every participant or only the caller's organizations
- * @param participatingOrganizations the period's frozen participant set, narrowed to what the
- *     caller may see. This is the denominator, and it is deliberately not "organizations that
- *     exist today"
- * @param byStatus every status, including NOT_STARTED, summing to participatingOrganizations
+ * @param participatingOrganizations the denominator: the frozen participant set narrowed to what
+ *     the caller may see, not the organizations that exist today
+ * @param byStatus every status, NOT_STARTED included, summing to participatingOrganizations
  */
 public record PeriodSummary(
         PeriodId periodId,
@@ -28,7 +26,6 @@ public record PeriodSummary(
         MY_ORGANIZATIONS
     }
 
-    /** The submission statuses plus the one a participant has when it has not started. */
     public enum SummaryStatus {
         NOT_STARTED,
         DRAFT,

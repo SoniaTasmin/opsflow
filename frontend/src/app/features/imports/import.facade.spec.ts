@@ -45,11 +45,12 @@ class StubApi {
 
 class StubNotifier {
   readonly errors: ApiError[] = [];
+  readonly successes: string[] = [];
   notify(error: ApiError): void {
     this.errors.push(error);
   }
-  success(): void {
-    // The facade reports success through the snack bar; the tests only care that it does not throw.
+  success(message: string): void {
+    this.successes.push(message);
   }
 }
 

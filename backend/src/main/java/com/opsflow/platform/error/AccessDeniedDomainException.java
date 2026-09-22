@@ -3,12 +3,7 @@ package com.opsflow.platform.error;
 
 import java.util.Map;
 
-/**
- * The caller can see the resource but may not perform this action.
- *
- * <p>Reserved for exactly that case. When the caller has no visibility of the resource at all,
- * throw {@link NotFoundException} instead.
- */
+/** The caller sees the resource but may not act on it. No visibility at all is {@link NotFoundException}. */
 public final class AccessDeniedDomainException extends DomainException {
 
     public AccessDeniedDomainException(String message) {

@@ -2,13 +2,7 @@ import { Page, expect, test } from '@playwright/test';
 
 import { dialogButton, fillField, findRow, navigateTo, signIn } from './app';
 
-/**
- * The milestone's acceptance scenario, driven as a real user: an administrator sets a period
- * up, a reporter fills it in, a reviewer returns it, and the correction is approved.
- *
- * Each role gets its own browser context. Tokens are held in memory, so a shared context would
- * mean signing out and back in between every step.
- */
+/** Each role gets its own context: tokens are in memory, so sharing one would mean re-signing in. */
 
 const RUN = Date.now().toString().slice(-6);
 const ORG_CODE = `E2E${RUN}`;

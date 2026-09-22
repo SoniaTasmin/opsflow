@@ -1,7 +1,5 @@
 import { Browser, Locator, Page, expect } from '@playwright/test';
 
-/** Shared driving helpers: both specs sign in for real and navigate through the shell. */
-
 export const NAV: Record<string, string> = {
   Home: '/home',
   'Period summary': '/summary',
@@ -25,10 +23,7 @@ export async function signIn(browser: Browser, username: string): Promise<Page> 
   return page;
 }
 
-/**
- * Tokens live in memory, so a full page load lands the user back on the home screen after a
- * silent re-authentication. Every navigation therefore goes through the shell's own links.
- */
+/** A full page load re-authenticates and lands on home, so navigation goes through the shell. */
 export async function navigateTo(page: Page, label: string): Promise<void> {
   // The nav link's accessible name carries the Material icon ligature as well as the label.
   await page.getByRole('link', { name: new RegExp(`${label}$`) }).click();
@@ -44,10 +39,7 @@ export function dialogButton(page: Page, name: string): Locator {
   return page.getByRole('dialog').getByRole('button', { name, exact: true });
 }
 
-/**
- * Admin lists are paginated and ordered by code, so a freshly created row is not necessarily on
- * the first page once a database has some history. Search for it rather than assuming.
- */
+/** Admin lists are paginated and ordered by code, so a new row may not be on the first page. */
 export async function findRow(page: Page, code: string): Promise<Locator> {
   // The label is shared with the search button beside the field, and the search runs on Enter.
   await page.getByPlaceholder('Code or name').fill(code);

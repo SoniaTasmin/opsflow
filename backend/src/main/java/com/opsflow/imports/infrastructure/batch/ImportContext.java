@@ -9,9 +9,8 @@ import com.opsflow.reporting.PeriodId;
 import com.opsflow.submission.ImportAuthority;
 
 /**
- * What a running import knows about itself. The authority comes from the job row, which recorded
- * it at admission from a verified token: the batch thread has no security context and must not
- * invent one.
+ * The authority comes from the job row, recorded at admission from a verified token: a batch
+ * thread has no security context and must not invent one.
  */
 record ImportContext(
         ImportJobId jobId,

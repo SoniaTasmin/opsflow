@@ -3,12 +3,7 @@ package com.opsflow.platform.error;
 
 import java.util.Map;
 
-/**
- * The resource's current state conflicts with the request: reloading and retrying may succeed.
- *
- * <p>Use for optimistic-lock failures, uniqueness violations and illegal state transitions —
- * not for business rules, which are {@link BusinessRuleException} (422). See {@link ErrorCode}.
- */
+/** State conflicts with the request and a reload may fix it: optimistic locks, uniqueness, transitions. */
 public non-sealed class ConflictException extends DomainException {
 
     public ConflictException(ErrorCode errorCode, String message) {

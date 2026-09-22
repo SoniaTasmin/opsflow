@@ -8,10 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.util.UUID;
 
 /**
- * @param participatingOrganizations the period's frozen participant set as this caller sees it —
- *     not the number of organizations that exist today
- * @param completionRatio approved submissions over participating organizations, 0 when there are
- *     none to report
+ * @param participatingOrganizations the frozen participant set as this caller sees it, not the
+ *     organizations that exist today
  */
 public record PeriodSummaryResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) UUID periodId,

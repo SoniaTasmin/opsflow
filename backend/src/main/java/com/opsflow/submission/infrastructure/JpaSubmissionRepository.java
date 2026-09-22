@@ -123,10 +123,9 @@ class JpaSubmissionRepository implements SubmissionRepository {
     }
 
     /**
-     * Values are part of the aggregate, so a value-only edit must still move the version --
-     * otherwise two authors could overwrite each other's numbers without either seeing a
-     * conflict. Writing {@code updated_at} on every update is what makes the root row dirty and
-     * the version bump unconditional; {@code SubmissionApiIntegrationTest} pins that behaviour.
+     * A value-only edit must still move the version, or two authors overwrite each other with no
+     * conflict. Writing {@code updated_at} every time is what keeps the root row dirty;
+     * {@code SubmissionApiIntegrationTest} pins it.
      */
     @Override
     public Submission update(Submission submission, long expectedVersion, UserId updatedBy) {
@@ -245,10 +244,7 @@ class JpaSubmissionRepository implements SubmissionRepository {
                 .list();
     }
 
-    /**
-     * One grouped query for the whole set: the caller's denominator can be hundreds of
-     * organizations, and asking per organization is how a summary screen becomes a load test.
-     */
+    /** One grouped query: a denominator of hundreds asked one at a time is a load test. */
     @Override
     public Map<SubmissionStatus, Integer> countByStatus(
             PeriodId reportingPeriodId, Set<OrganizationId> organizationIds) {

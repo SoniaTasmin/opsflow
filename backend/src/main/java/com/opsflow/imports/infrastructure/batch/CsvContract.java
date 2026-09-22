@@ -4,16 +4,10 @@ package com.opsflow.imports.infrastructure.batch;
 import java.util.List;
 
 /**
- * The import file format.
+ * {@code organization_code,metric_code,value,note}.
  *
- * <pre>
- * organization_code,metric_code,value,note
- * BERLIN_OPS,HEADCOUNT,42,optional note
- * </pre>
- *
- * <p>The reporting period comes from the request rather than the file: one upload targets one
- * period, and a period column would let a single file write across periods the request was never
- * authorized for.
+ * <p>The period comes from the request, not the file: a period column would let one upload write
+ * across periods the request was never authorized for.
  */
 public final class CsvContract {
 

@@ -9,10 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * A complete replacement of the submission's values: a metric left out is cleared. The value
- * form posts every metric in scope, so there is no partial-save case to merge.
- */
+/** A complete replacement: a metric left out is cleared. The form posts every metric in scope. */
 public record SaveValuesRequest(@NotNull @Valid List<SubmissionValueEntry> values, @PositiveOrZero long version) {
 
     public record SubmissionValueEntry(

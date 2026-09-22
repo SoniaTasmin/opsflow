@@ -42,9 +42,8 @@ test('a reporter sees no administration navigation', async ({ page }) => {
 test('a reporter never reaches an admin screen', async ({ page }) => {
   await signIn(page, 'reporter');
 
-  // A deep link is a full page load, which discards the in-memory tokens and sends the
-  // user back through the identity provider; they land on home rather than the requested
-  // route. Either way the admin screen must not render.
+  // A deep link is a full page load, so the user re-authenticates and lands on home. Either
+  // way the admin screen must not render.
   await page.goto('/admin/organizations');
   await page.waitForTimeout(3_000);
 

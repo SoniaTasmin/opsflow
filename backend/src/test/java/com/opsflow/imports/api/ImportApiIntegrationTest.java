@@ -129,8 +129,6 @@ class ImportApiIntegrationTest {
         organizationCommands.addMember(alpha, reporter);
     }
 
-    // ------------------------------------------------------------ access
-
     @Test
     void everyImportEndpointRequiresAuthentication() throws Exception {
         mockMvc.perform(get(IMPORTS)).andExpect(status().isUnauthorized());
@@ -149,8 +147,6 @@ class ImportApiIntegrationTest {
         mockMvc.perform(upload(CSV, stranger(), period, alpha, UUID.randomUUID().toString()))
                 .andExpect(status().isForbidden());
     }
-
-    // ------------------------------------------------------------ admission basis
 
     @Test
     void aMemberIsAdmittedAsAMember() throws Exception {
@@ -173,8 +169,6 @@ class ImportApiIntegrationTest {
 
         assertThat(authorizationModeOf(job)).isEqualTo("ORGANIZATION_MEMBER");
     }
-
-    // ------------------------------------------------------------ idempotency
 
     @Test
     void theSameKeyAndRequestReturnsTheJobThatAlreadyExists() throws Exception {
@@ -245,8 +239,6 @@ class ImportApiIntegrationTest {
                 .andExpect(jsonPath("$.code").value("IDEMPOTENCY_KEY_REQUIRED"));
     }
 
-    // ------------------------------------------------------------ the request itself
-
     @Test
     void aFileThatIsNotCsvIsRefused() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
@@ -289,8 +281,6 @@ class ImportApiIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM opsflow.import_job", Long.class))
                 .isZero();
     }
-
-    // ------------------------------------------------------------ visibility
 
     @Test
     void theListShowsOnlyImportsTheCallerMaySee() throws Exception {
@@ -338,8 +328,6 @@ class ImportApiIntegrationTest {
                 .andExpect(jsonPath("$.invalidRows").value(0))
                 .andExpect(jsonPath("$.submittedRows").value(1));
     }
-
-    // ------------------------------------------------------------ helpers
 
     private UUID start(String csv, Jwt actor, PeriodId reportingPeriodId, OrganizationId organizationId)
             throws Exception {

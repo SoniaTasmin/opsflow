@@ -29,7 +29,6 @@ export class AuthService {
     return roles.some((role) => this.hasRole(role));
   }
 
-  /** Completes the OIDC handshake, then loads the identity the backend recognises. */
   bootstrap(): Observable<CurrentUserResponse | null> {
     return this.oidc.checkAuth().pipe(
       tap((result) => this.authenticated.set(result.isAuthenticated)),

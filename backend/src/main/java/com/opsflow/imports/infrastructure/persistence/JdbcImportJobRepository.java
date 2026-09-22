@@ -195,8 +195,7 @@ class JdbcImportJobRepository implements ImportJobRepository {
 
         StringBuilder where = new StringBuilder(" WHERE 1 = 1");
         if (criteria.onlyInitiatedBy() != null) {
-            // A caller who may see only their own work: scoped imports they may see, plus
-            // anything they started themselves.
+            // Their own imports, plus any scoped to an organization they belong to.
             where.append(" AND (created_by = :initiatedBy");
             if (visible != null && !visible.isEmpty()) {
                 where.append(" OR organization_id = ANY (:visible)");

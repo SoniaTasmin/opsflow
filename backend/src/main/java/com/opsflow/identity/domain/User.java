@@ -8,14 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * A local projection of a person authenticated by the identity provider.
- *
- * <p>Holds only what the application needs in order to attribute work and render a name: it is
- * never the authority for credentials, and it deliberately carries <strong>no roles</strong>.
- * Roles are read from the token on every request (ADR-0003).
- *
- * <p>The profile fields are upstream display data and may change at any time, so nothing keys on
- * them — identity is {@link #id()}, recognition is {@link #externalIdentity()}.
+ * Enough to attribute work and render a name, and no roles: those come from the token (ADR-0003).
+ * Profile fields are upstream data that can change, so nothing keys on them.
  */
 public final class User {
 
@@ -44,7 +38,6 @@ public final class User {
         this.lastSeenAt = Objects.requireNonNull(lastSeenAt, "lastSeenAt is required");
     }
 
-    /** Creates the local record the first time a person authenticates. */
     public static User provision(
             UserId id,
             ExternalIdentity externalIdentity,
@@ -55,7 +48,6 @@ public final class User {
         return new User(id, externalIdentity, username, displayName, email, now, now);
     }
 
-    /** Rehydrates an existing user from storage. */
     public static User rehydrate(
             UserId id,
             ExternalIdentity externalIdentity,
@@ -67,11 +59,7 @@ public final class User {
         return new User(id, externalIdentity, username, displayName, email, firstSeenAt, lastSeenAt);
     }
 
-    /**
-     * Refreshes the profile from the current token and records the visit.
-     *
-     * @return whether anything actually changed, so an unchanged user costs no write
-     */
+    /** @return whether anything changed, so an unchanged user costs no write */
     public boolean recordSeen(String username, String displayName, String email, Instant now, Duration staleAfter) {
         boolean profileChanged = !Objects.equals(this.username, username)
                 || !Objects.equals(this.displayName, displayName)

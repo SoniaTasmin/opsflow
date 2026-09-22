@@ -12,7 +12,6 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Serves the published {@link UserDirectory} from the identity module's own storage. */
 @Component
 class UserDirectoryService implements UserDirectory {
 

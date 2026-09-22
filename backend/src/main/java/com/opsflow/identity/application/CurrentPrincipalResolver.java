@@ -21,16 +21,9 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 /**
- * Resolves the current request's token into an application {@link Actor}, provisioning the local
- * user on first sight.
- *
- * <p>The resolved actor is memoised in request scope. Without that, a request touching several
- * components would repeat the same identity lookup for each one — the classic N+1, just on the
- * authentication path rather than a query.
- *
- * <p>This is not a cross-request cache. Caching the immutable (issuer, subject) to user-id
- * mapping between requests is an obvious further optimisation, deliberately left unbuilt until
- * measurement shows the lookup matters.
+ * Memoised per request so a request touching several components does not repeat the identity
+ * lookup. Not a cross-request cache: the (issuer, subject) mapping is immutable and caching it
+ * between requests is an optimisation left until measurement asks for it.
  */
 @Component
 class CurrentPrincipalResolver implements CurrentActorProvider, CurrentUserProvider, CurrentUserProfile {

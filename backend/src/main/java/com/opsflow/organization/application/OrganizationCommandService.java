@@ -98,10 +98,7 @@ public class OrganizationCommandService {
         }
     }
 
-    /**
-     * Authorship, not authorization: CurrentUserProvider works off-request, where an Actor and
-     * its roles have no meaning.
-     */
+    /** Authorship, not authorization: this works off-request, where roles have no meaning. */
     private UserId actorId() {
         return currentUser.currentUserId().orElse(null);
     }

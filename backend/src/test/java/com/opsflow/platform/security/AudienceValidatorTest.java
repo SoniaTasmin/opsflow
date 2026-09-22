@@ -40,9 +40,7 @@ class AudienceValidatorTest {
 
     @Test
     void rejectsATokenMintedForADifferentClient() {
-        // Signature and issuer checks prove a token is genuine, not that it was meant
-        // for us. Without this, any validly-signed token from the realm is accepted —
-        // including one a user consented to give an entirely different application.
+        // Signature and issuer prove a token is genuine, not that it was meant for us.
         assertThat(validator.validate(tokenFor(List.of("some-other-api"))).hasErrors())
                 .isTrue();
     }

@@ -12,12 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * The single place a value is checked against the metric it reports.
- *
- * <p>Manual editing and CSV import both run through this, so a value a reviewer sees can never
- * have entered by a route with weaker rules.
- */
+/** The one place a value is checked, so nothing reaches a reviewer by a route with weaker rules. */
 public final class SubmissionValidationPolicy {
 
     /** Matches numeric(18,4) in the schema: rounding a user's number silently is not acceptable. */

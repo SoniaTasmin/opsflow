@@ -2,10 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { dialogButton, fillField, findRow, navigateTo, selectOption, signIn } from './app';
 
-/**
- * The summary screen against a period the test creates and fills in, so the figures it asserts
- * are ones it caused rather than whatever the database happened to hold.
- */
+/** A period the test creates, so the figures it asserts are ones it caused. */
 
 const RUN = Date.now().toString().slice(-6);
 const ORG_CODE = `SUM${RUN}`;

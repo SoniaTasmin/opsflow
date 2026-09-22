@@ -20,18 +20,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * Translates every exception that escapes a controller into the one error shape defined by
- * {@link ProblemDetailFactory}.
- *
- * <p>Two rules govern what reaches the client:
- *
- * <ul>
- *   <li><b>Nothing internal leaks.</b> A 500 carries a generic message and the correlation id —
- *       never a stack trace, exception class name, SQL statement or constraint name. The detail
- *       goes to the log, where the correlation id connects the two.
- *   <li><b>Client errors are not incidents.</b> 4xx is logged at WARN without a stack trace, so
- *       a misbehaving client cannot fill the error log or page anyone.
- * </ul>
+ * A 500 carries a generic message and the correlation id — never a stack trace, exception name,
+ * SQL or constraint name. 4xx logs at WARN without a stack trace so a bad client cannot page
+ * anyone.
  */
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -45,12 +36,9 @@ public class GlobalExceptionHandler {
         this.problems = problems;
     }
 
-    // ---------------------------------------------------------------- domain
-
     @ExceptionHandler(BusinessRuleException.class)
     public ProblemDetail handleBusinessRule(BusinessRuleException ex) {
         log.warn("Business rule violated: rule={} detail={}", ex.ruleCode(), ex.getMessage());
-        // The specific rule code replaces the generic enum name: it is what a client switches on.
         return problems.create(ex.errorCode(), ex.ruleCode(), ex.getMessage(), ex.context(), List.of());
     }
 
@@ -66,16 +54,10 @@ public class GlobalExceptionHandler {
         return problems.create(ex.errorCode(), ex.getMessage(), ex.context());
     }
 
-    // ------------------------------------------------------------ validation
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleBodyValidation(MethodArgumentNotValidException ex) {
-        // rejectedValue is deliberately NOT populated here. This handler sees every
-        // request body in the application, including ones carrying credentials, tokens
-        // or personal data, and it cannot know which field is which. Echoing the
-        // submitted value back would reflect that content into a response body and into
-        // any log or error tracker that records it. A domain-specific handler may include
-        // a value it knows to be a safe scalar; the generic path never does.
+        // rejectedValue stays null: this handler sees every request body, including ones
+        // carrying credentials, and cannot tell which field is which.
         List<ApiFieldError> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> ApiFieldError.of(
                         fe.getField(),
@@ -93,7 +75,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
-        // As above: the invalid value is not reflected back to the client.
+        // As above: the submitted value is never echoed back.
         List<ApiFieldError> errors = ex.getConstraintViolations().stream()
                 .map(v -> ApiFieldError.of(String.valueOf(v.getPropertyPath()), "INVALID", v.getMessage()))
                 .toList();
@@ -106,11 +88,9 @@ public class GlobalExceptionHandler {
                 errors);
     }
 
-    // --------------------------------------------------------- malformed input
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleUnreadableBody(HttpMessageNotReadableException ex) {
-        // Deliberately does not echo the parser message: it can quote the request body.
+        // The parser message can quote the request body, so it is not echoed.
         log.warn("Unreadable request body: {}", ex.getMostSpecificCause().getMessage());
         return problems.create(ErrorCode.MALFORMED_REQUEST, "The request body could not be parsed");
     }
@@ -148,17 +128,13 @@ public class GlobalExceptionHandler {
         return problems.create(ErrorCode.RESOURCE_NOT_FOUND, "No endpoint matches this request");
     }
 
-    // ----------------------------------------------------------- authorization
-
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
-        // Method security denial: the caller is authenticated, so 403 is correct. A denial
-        // that must not confirm the resource exists is thrown as NotFoundException instead.
+        // The caller is authenticated, so 403 is right here. A denial that must not confirm the
+        // resource exists is thrown as NotFoundException instead.
         log.info("Denied an authenticated request: {}", ex.getMessage());
         return problems.create(ErrorCode.ACCESS_DENIED, "You do not have permission to perform this action");
     }
-
-    // ------------------------------------------------------------- catch-all
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex) {

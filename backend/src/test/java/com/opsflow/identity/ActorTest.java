@@ -57,8 +57,7 @@ class ActorTest {
 
     @Test
     void carriesATypedIdentifierRatherThanARawUuid() {
-        // The compiler is what stops a submission id or an organization id being passed
-        // where a user id belongs; every one of them is a UUID underneath.
+        // Every id here is a UUID underneath; only the type stops one being passed for another.
         assertThat(new Actor(USER_ID, Set.of()).userId()).isInstanceOf(UserId.class);
     }
 }
