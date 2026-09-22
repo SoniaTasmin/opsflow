@@ -1,4 +1,3 @@
-/** The RFC 9457 problem detail the backend returns for every failure. */
 export interface ProblemDetail {
   type?: string;
   title?: string;

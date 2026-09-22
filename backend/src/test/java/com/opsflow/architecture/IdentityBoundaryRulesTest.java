@@ -28,10 +28,8 @@ class IdentityBoundaryRulesTest {
 
     @Test
     void theExternalIdentityNeverLeavesTheIdentityModule() {
-        // How a person is recognised upstream is the identity module's business. If
-        // ExternalIdentity spreads, the OIDC subject starts appearing in other modules'
-        // signatures and eventually in a foreign key — which is precisely the coupling
-        // the application-owned UserId exists to prevent.
+        // If ExternalIdentity spreads, the OIDC subject ends up in other modules' signatures and
+        // eventually in a foreign key — the coupling UserId exists to prevent.
         noClasses()
                 .that()
                 .resideOutsideOfPackage("com.opsflow.identity..")
@@ -45,9 +43,7 @@ class IdentityBoundaryRulesTest {
 
     @Test
     void noModuleOutsideIdentityReadsRawTokens() {
-        // Business code must depend on Actor and its roles, never on the token those
-        // roles came from. Reaching for the Jwt elsewhere is how claim-parsing logic
-        // ends up duplicated and inconsistent across modules.
+        // Reaching for the Jwt outside identity is how claim parsing ends up duplicated.
         noClasses()
                 .that()
                 .resideOutsideOfPackage("com.opsflow.identity..")

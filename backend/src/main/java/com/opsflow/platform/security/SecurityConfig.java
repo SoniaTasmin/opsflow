@@ -23,15 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Stateless bearer-token security.
- *
- * <p>Every endpoint is closed unless explicitly opened: the chain ends in {@code denyAll}, so a
- * new controller is unreachable until someone deliberately decides who may reach it. The reverse
- * default — open unless secured — means a forgotten rule is a vulnerability rather than a 403.
- *
- * @see <a href="file:../../../../../../../../docs/adr/0003-identity-and-authorization.md">ADR-0003</a>
- */
+/** Stateless bearer tokens; the chain ends in {@code denyAll}, so a new endpoint is closed until admitted (ADR-0008). */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(SecurityProperties.class)
 @EnableMethodSecurity
@@ -48,14 +40,12 @@ public class SecurityConfig {
             HttpSecurity http, ProblemDetailFactory problems, ObjectMapper objectMapper) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
-                        // Probes must answer before and during authentication problems:
-                        // gating them on the very system that might be failing is how a
-                        // dependency outage becomes a restart loop.
+                        // Gating probes on the system that might be failing turns an outage into
+                        // a restart loop.
                         .requestMatchers("/actuator/health", "/actuator/health/**")
                         .permitAll()
-                        // Everything else on actuator is closed at the security layer as well
-                        // as by management endpoint exposure. Two independent gates, because
-                        // /actuator/env leaking configuration is a serious enough outcome.
+                        // Closed here as well as by endpoint exposure: two gates, because
+                        // /actuator/env leaking configuration is bad enough to warrant both.
                         .requestMatchers("/actuator/**")
                         .denyAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**")
@@ -64,21 +54,16 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/**")
                         .authenticated()
-                        // Nothing else is reachable. A new endpoint is denied until a rule
-                        // above deliberately admits it.
                         .anyRequest()
                         .denyAll())
 
-                // No server-side session and no JSESSIONID: the token is the whole state.
+                // No session and no JSESSIONID: the token is the whole request state.
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // CSRF exists because browsers attach cookies automatically. This API
-                // authenticates only via an Authorization header that JavaScript must set
-                // deliberately, and issues no session cookie, so a cross-site form post
-                // carries no credentials and is simply unauthenticated.
-                //
-                // TRIPWIRE: if any authentication ever moves to cookies — a BFF, "remember
-                // me", anything — CSRF protection must be re-enabled in the same commit.
+                // Safe only because nothing authenticates by cookie: a cross-site form post
+                // carries no credentials here.
+                // TRIPWIRE: if authentication ever moves to cookies — a BFF, "remember me",
+                // anything — re-enable CSRF in the same commit.
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers.frameOptions(frame -> frame.deny())
@@ -88,8 +73,8 @@ public class SecurityConfig {
                         .referrerPolicy(referrer -> referrer.policy(
                                 org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter
                                         .ReferrerPolicy.NO_REFERRER))
-                        // This is a JSON API: it serves no scripts, styles or frames, so the
-                        // most restrictive policy possible is also a correct one.
+                        // A JSON API serves no scripts, styles or frames, so the strictest
+                        // policy is also the correct one.
                         .contentSecurityPolicy(
                                 csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'")))
                 .oauth2ResourceServer(oauth2 -> oauth2.authenticationEntryPoint(
@@ -103,13 +88,9 @@ public class SecurityConfig {
     }
 
     /**
-     * Validates signature, issuer, expiry and not-before (with a small clock-skew tolerance),
-     * and additionally that the token was issued for this API.
-     *
-     * <p>{@code withIssuerLocation} resolves the provider's metadata lazily, on first use, rather
-     * than during startup. That matters twice: the application starts and reports healthy when
-     * the identity provider is briefly unreachable instead of failing to boot, and the test suite
-     * does not silently require a running Keycloak to load an application context.
+     * Signature, issuer, validity window and audience. Metadata resolves lazily so a briefly
+     * unreachable identity provider does not stop the application booting, and so loading an
+     * application context in a test does not silently require a running Keycloak.
      */
     @Bean
     public NimbusJwtDecoder jwtDecoder(OAuth2ResourceServerProperties properties) {
@@ -129,15 +110,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Exact origins from configuration. Never a wildcard, and never a reflected
-        // Origin header: with credentials allowed that combination is the classic
-        // CORS foot-gun.
+        // Exact origins only. Never a wildcard and never a reflected Origin header.
         configuration.setAllowedOrigins(securityProperties.allowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(
                 List.of("Authorization", "Content-Type", "X-Correlation-Id", "Idempotency-Key"));
         configuration.setExposedHeaders(List.of("Location", "X-Correlation-Id"));
-        // Bearer tokens, not cookies: the browser never needs to attach credentials.
+        // Bearer tokens, not cookies: the browser never attaches credentials itself.
         configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);
 

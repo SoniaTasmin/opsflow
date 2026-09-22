@@ -46,9 +46,8 @@ class UserControllerIntegrationTest {
         given(jwtDecoder.decode(anyString())).willThrow(new BadJwtException("Unverifiable token"));
         jdbc.execute("TRUNCATE opsflow.org_membership, opsflow.organization, opsflow.app_user CASCADE");
 
-        // Provisioning is lazy: a user appears locally once an endpoint resolves their
-        // identity. The frontend calls /me at bootstrap, so an administrator reaching an
-        // admin screen has always been provisioned by then.
+        // Provisioning is lazy, and the frontend calls /me at bootstrap, so anyone reaching an
+        // admin screen has been provisioned by then.
         mockMvc.perform(get("/api/v1/me").with(as(admin()))).andExpect(status().isOk());
         provision("alice-subject", "alice", "Alice Anderson");
         provision("bob-subject", "bob", "Bob Brown");

@@ -2,19 +2,8 @@
 package com.opsflow.submission;
 
 /**
- * The submission lifecycle.
- *
- * <pre>
- *   DRAFT ──submit──▶ SUBMITTED ──claim──▶ UNDER_REVIEW ──approve──▶ APPROVED
- *     ▲                   │                     │
- *     └────withdraw───────┘     ┌───release──────┤
- *                               ▼                ▼
- *                          SUBMITTED         REJECTED ──submit──▶ SUBMITTED
- * </pre>
- *
- * <p>REJECTED is a persisted editable state rather than a return to DRAFT: the reason a
- * reviewer gave has to survive long enough for the author to act on it, and the history has to
- * show that the submission was rejected rather than merely never finished.
+ * REJECTED is its own editable state rather than a return to DRAFT: the reviewer's reason has to
+ * outlive the transition, and the history has to show it was returned rather than never finished.
  */
 public enum SubmissionStatus {
     DRAFT,
@@ -23,7 +12,6 @@ public enum SubmissionStatus {
     APPROVED,
     REJECTED;
 
-    /** Whether values may be added, changed or removed in this state. */
     public boolean editable() {
         return this == DRAFT || this == REJECTED;
     }

@@ -35,10 +35,7 @@ class LocalFileImportStore implements ImportFileStore {
         }
     }
 
-    /**
-     * One pass over the stream produces the file, its checksum and its row count: the content is
-     * never held in memory, and reading it three times would be three times the I/O.
-     */
+    /** One pass yields the file, its checksum and its row count; the content is never held in memory. */
     @Override
     public StoredFile store(ImportJobId jobId, InputStream content) {
         Path target = resolve(ref(jobId));
@@ -93,11 +90,7 @@ class LocalFileImportStore implements ImportFileStore {
         return jobId.value() + ".csv";
     }
 
-    /**
-     * Storage names are generated from the job id, never from anything a client sent. This also
-     * refuses a reference that would escape the directory, so a stored name can never be used to
-     * read or write elsewhere.
-     */
+    /** Names come from the job id, never from a client. Refuses anything escaping the directory. */
     private Path resolve(String ref) {
         Path candidate = root.resolve(ref).normalize();
         if (!candidate.startsWith(root)) {

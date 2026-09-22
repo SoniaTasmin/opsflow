@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Spans identity and organization, so it lives in the composition layer: the module order
- * forbids identity from asking organization anything.
- */
+/** Spans identity and organization; the module order forbids identity from asking organization. */
 @RestController
 @RequestMapping(path = "/api/v1/me", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Identity", description = "The authenticated user")

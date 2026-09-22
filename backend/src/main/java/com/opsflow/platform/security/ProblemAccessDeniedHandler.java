@@ -14,13 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Returns 403 as a problem detail.
- *
- * <p>Used when the caller is authenticated but lacks the required role. Resource-level denials
- * where the caller cannot even see the owning organization return 404 instead, so that a response
- * never confirms the existence of something invisible to them.
- */
+/** 403 for a missing role. A caller who cannot see the owning organization gets 404 instead. */
 class ProblemAccessDeniedHandler implements AccessDeniedHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ProblemAccessDeniedHandler.class);

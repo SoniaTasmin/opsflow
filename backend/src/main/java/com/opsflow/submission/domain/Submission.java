@@ -25,12 +25,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * The only writer of submission data. Manual editing and CSV import converge here, so there is
- * no second path with weaker invariants.
- *
- * <p>Rules that need another aggregate — the period being open, the organization participating —
- * are enforced by the application service, which is where a cross-aggregate read belongs. What
- * this class owns is the state machine, the values and the history they produce.
+ * The only writer of submission data: manual editing and CSV import both converge here. Rules
+ * needing another aggregate — period open, organization participating — belong to the
+ * application service.
  */
 public final class Submission {
 
@@ -126,9 +123,8 @@ public final class Submission {
     }
 
     /**
-     * Replaces the whole value set: a metric absent from {@code entries} is removed. The value
-     * form posts every metric in scope, so a partial post is a client bug rather than a partial
-     * save, and silently merging one would leave the author believing they had cleared a figure.
+     * A metric absent from {@code entries} is cleared. The form posts every metric in scope, so
+     * merging a partial post would leave the author believing they had cleared a figure.
      */
     public void replaceValues(List<ValueEntry> entries, ValueSource source, SubmissionValidationPolicy policy) {
         assertEditable();
@@ -152,7 +148,7 @@ public final class Submission {
         values.putAll(replacement);
     }
 
-    /** Upserts one value, leaving the rest alone. This is the path CSV import will use. */
+    /** Upserts one value: the path CSV import uses. */
     public void setValue(
             MetricId metricId, BigDecimal value, String note, ValueSource source, SubmissionValidationPolicy policy) {
         assertEditable();

@@ -3,13 +3,7 @@ package com.opsflow.platform.error;
 
 import java.util.Map;
 
-/**
- * The request is well formed but a business rule rejects it: retrying it unchanged will always
- * fail. Maps to 422.
- *
- * <p>Carries its own {@link ErrorCode} because business rules are module-specific — the codes
- * are contributed by the modules that own the rules rather than enumerated centrally here.
- */
+/** A well-formed request a rule refuses: 422, with a module-supplied {@code ruleCode}. */
 public final class BusinessRuleException extends DomainException {
 
     private final String ruleCode;
@@ -23,10 +17,7 @@ public final class BusinessRuleException extends DomainException {
         this.ruleCode = ruleCode;
     }
 
-    /**
-     * The violated rule, in {@code SCREAMING_SNAKE_CASE}. This is what a client switches on and
-     * what is reported as {@code code}, in place of the generic enum constant.
-     */
+    /** Reported as {@code code} in place of the enum constant; clients switch on it. */
     public String ruleCode() {
         return ruleCode;
     }

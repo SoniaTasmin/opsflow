@@ -17,9 +17,8 @@ import java.util.stream.Collectors;
 import org.springframework.batch.infrastructure.item.ItemProcessor;
 
 /**
- * Resolves codes and parses numbers so a rejection can name the row and the code that caused it.
- * It deliberately does not judge whether a value is acceptable: that rule belongs to the module
- * that owns submissions, and two copies of it would drift.
+ * Resolves codes and parses numbers so a rejection can name its row. Whether a value is
+ * acceptable is the submission module's rule; a second copy here would drift.
  */
 class RowValidationProcessor implements ItemProcessor<RawRow, ParsedRow> {
 

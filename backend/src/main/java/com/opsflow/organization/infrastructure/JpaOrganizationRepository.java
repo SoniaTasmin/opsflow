@@ -135,8 +135,6 @@ class JpaOrganizationRepository implements OrganizationRepository {
         memberships.flush();
     }
 
-    // --- projections --------------------------------------------------------
-
     @Override
     public boolean isMember(UserId userId, OrganizationId organizationId) {
         return memberships.existsByUserIdAndOrganizationId(userId.value(), organizationId.value());

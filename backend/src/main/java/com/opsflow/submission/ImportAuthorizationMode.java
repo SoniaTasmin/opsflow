@@ -2,17 +2,14 @@
 package com.opsflow.submission;
 
 /**
- * The basis on which an asynchronous import was admitted.
- *
- * <p>Not a persisted role. It is written once from a verified token at admission, scoped to a
- * single job, and read only when that job applies values. Nothing else may read it as "this user
- * is an administrator".
+ * The basis one import was admitted on — not a persisted role. Written once from a verified token
+ * and read only when that job applies values; nothing else may read it as "this user is admin".
  */
 public enum ImportAuthorizationMode {
 
-    /** The initiator belonged to the target organization; membership is re-checked per group. */
+    /** Membership is re-checked per group while the job runs. */
     ORGANIZATION_MEMBER,
 
-    /** An administrator loading centrally. Waives membership and nothing else. */
+    /** Waives membership and nothing else. */
     ADMIN_OVERRIDE
 }

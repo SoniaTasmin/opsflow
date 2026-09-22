@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * Deliberately our own type rather than Spring Data's {@code Page}: serialising {@code Page}
- * exposes framework internals as a public API contract.
- */
+/** Our own type: serialising Spring Data's {@code Page} would make framework internals the contract. */
 public record PageResponse<T>(
         @Schema(requiredMode = RequiredMode.REQUIRED) List<T> content,
         @Schema(requiredMode = RequiredMode.REQUIRED) int page,

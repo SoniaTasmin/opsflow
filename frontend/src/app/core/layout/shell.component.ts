@@ -39,7 +39,6 @@ export class ShellComponent {
   protected readonly roles = this.auth.roles;
   protected readonly organizations = this.auth.organizations;
 
-  /** The nav offers only what the user's roles allow, matching the route guards. */
   protected readonly navItems = () => NAV_ITEMS.filter((item) => this.auth.hasAnyRole(item.roles));
 
   protected toggleSidenav(): void {

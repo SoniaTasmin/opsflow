@@ -5,13 +5,7 @@ import com.opsflow.identity.UserId;
 import com.opsflow.identity.domain.ExternalIdentity;
 import com.opsflow.identity.domain.User;
 
-/**
- * Hand-written mapping between the domain type and its persistence shape.
- *
- * <p>No mapping framework: a generated mapper hides a dropped field behind an annotation
- * processor, and this is short enough that the cost of writing it is lower than the cost of not
- * being able to read it.
- */
+/** Hand-written: a generated mapper hides a dropped field behind an annotation processor. */
 final class UserMapper {
 
     private UserMapper() {}

@@ -9,11 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /**
- * What an idempotency key is compared against.
- *
- * <p>The file alone does not identify the operation: the same CSV sent against two periods is two
- * different imports that happen to share bytes. Covering the whole logical request is what stops
- * the second one silently returning the first one's job.
+ * The file alone does not identify the operation: one CSV sent against two periods is two
+ * imports that share bytes, and the second must not return the first one's job.
  */
 final class RequestFingerprint {
 

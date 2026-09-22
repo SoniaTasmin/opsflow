@@ -14,13 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Returns 401 as a problem detail rather than Spring Security's default empty body.
- *
- * <p>Authentication failures must use the same contract as every other error, so a client's error
- * handling has exactly one shape to deal with — and so the response still carries the correlation
- * id a user would quote to support.
- */
+/** 401 in the same problem shape as every other error, correlation id included. */
 class ProblemAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final Logger log = LoggerFactory.getLogger(ProblemAuthenticationEntryPoint.class);
@@ -36,8 +30,7 @@ class ProblemAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex)
             throws IOException {
-        // The reason is logged, never returned: telling a caller precisely why a token was
-        // rejected helps them craft a better one. The message itself never includes the token.
+        // Logged, never returned: precisely why a token was rejected helps craft a better one.
         log.info("Rejected unauthenticated request: path={} reason={}", request.getRequestURI(), ex.getMessage());
 
         ProblemDetail problem =

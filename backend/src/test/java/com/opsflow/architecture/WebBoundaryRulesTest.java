@@ -53,9 +53,8 @@ class WebBoundaryRulesTest {
 
     @Test
     void persistenceEntitiesAreNeverExposedThroughTheApi() {
-        // The rule the whole DTO layer exists to uphold: an @Entity in a controller
-        // signature makes the database schema the public API contract, so a column
-        // rename becomes a breaking change for every client.
+        // An @Entity in a controller makes the schema the API contract, so a column rename
+        // becomes a breaking change for every client.
         noClasses()
                 .that()
                 .resideInAPackage("..api..")
@@ -83,9 +82,8 @@ class WebBoundaryRulesTest {
 
     @Test
     void timeIsInjectedRatherThanReadFromAnAmbientGlobal() {
-        // Instant.now() and LocalDate.now() cannot be controlled from a test, so any
-        // deadline, expiry or period-boundary rule using them is only testable by
-        // waiting. Every component takes a Clock instead.
+        // Instant.now() cannot be controlled from a test, so a deadline rule using it is only
+        // testable by waiting.
         noClasses()
                 .that()
                 .resideInAPackage("com.opsflow..")

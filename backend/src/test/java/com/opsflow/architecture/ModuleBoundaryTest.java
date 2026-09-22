@@ -10,22 +10,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Enforces the module dependency order from the architecture plan:
- *
- * <pre>
- * platform -> identity -> organization -> reporting -> submission -> imports
- * </pre>
- *
- * <p>The order is total, so cycles are impossible by construction and any
- * back-edge fails the build. These rules exist from M0 — before there is
- * anything to violate — because boundary tests retrofitted onto an eroded
- * codebase never actually get written.
- *
- * <p>All six layers are declared from M0, before most of them exist.
- * {@code withOptionalLayers(true)} is required for that: without it ArchUnit
- * treats an empty layer as a violation in its own right, so the rule would fail
- * until the last module was written — and a rule that cannot pass is a rule
- * someone deletes.
+ * The module order is total, so cycles are impossible and any back-edge fails the build.
+ * {@code withOptionalLayers(true)} is required because ArchUnit treats an empty layer as a
+ * violation in itself.
  */
 class ModuleBoundaryTest {
 

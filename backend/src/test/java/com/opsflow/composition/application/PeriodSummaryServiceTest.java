@@ -119,8 +119,6 @@ class PeriodSummaryServiceTest {
         assertThat(summary.participatingOrganizations()).isZero();
     }
 
-    // ------------------------------------------------------------ visibility
-
     @Test
     void aReporterSeesOnlyTheirOwnOrganizationsIncludingTheDenominator() {
         periods.participants = new LinkedHashSet<>(List.of(alpha, beta, gamma));
@@ -173,8 +171,6 @@ class PeriodSummaryServiceTest {
 
         assertThat(submissions.calls).isEqualTo(1);
     }
-
-    // ------------------------------------------------------------ stubs
 
     private static final class StubPeriods implements PeriodQuery {
         private Set<OrganizationId> participants = new LinkedHashSet<>();

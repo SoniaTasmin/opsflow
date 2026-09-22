@@ -4,35 +4,23 @@ package com.opsflow.platform.domain;
 import java.util.Optional;
 
 /**
- * A global role, and the only source of "what kind of user this is".
- *
- * <p>Roles come from the Keycloak realm on every request and are <strong>never persisted</strong>:
- * a stored copy is a privilege-escalation bug with a delay fuse. Which organizations a user may
- * act for is a separate question, answered by membership in the database (ADR-0003).
+ * Read from the token on every request and never persisted: a stored copy is a
+ * privilege-escalation bug with a delay fuse. Which organizations they may act for is membership
+ * (ADR-0003).
  */
 public enum Role {
-
-    /** May work with the organizations they belong to. */
     USER,
 
-    /** Central reviewer: review authority across all organizations. */
+    /** Central: review authority across all organizations. */
     REVIEWER,
 
-    /** Platform administration. */
     ADMIN;
 
-    /** Spring Security's convention, applied when mapping token claims to authorities. */
     public String authority() {
         return "ROLE_" + name();
     }
 
-    /**
-     * Resolves a realm role name, ignoring anything unrecognised.
-     *
-     * <p>Keycloak issues roles of its own ({@code offline_access}, {@code uma_authorization}),
-     * and a realm may carry roles for other applications. Only the three roles this application
-     * defines ever become authorities.
-     */
+    /** Ignores anything unrecognised: Keycloak and other applications put their own roles in the realm. */
     public static Optional<Role> fromRealmRole(String realmRole) {
         if (realmRole == null) {
             return Optional.empty();

@@ -109,8 +109,6 @@ class OrganizationControllerIntegrationTest {
         return commands.create(new OrganizationCode(code), name).id().value();
     }
 
-    // ------------------------------------------------------------ authentication
-
     @Test
     void everyOrganizationEndpointRequiresAuthentication() throws Exception {
         UUID someId = UUID.randomUUID();
@@ -120,8 +118,6 @@ class OrganizationControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/organizations")).andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/v1/organizations/" + someId + "/members")).andExpect(status().isUnauthorized());
     }
-
-    // ------------------------------------------------------------ role gates
 
     @Test
     void onlyAnAdministratorMayCreateAnOrganization() throws Exception {
@@ -154,8 +150,6 @@ class OrganizationControllerIntegrationTest {
                                 {"code":"NOPE","name":"Not Allowed"}"""))
                 .andExpect(status().isForbidden());
     }
-
-    // ------------------------------------------------------------ visibility
 
     @Test
     void aUserSeesOnlyTheOrganizationsTheyBelongTo() throws Exception {
@@ -214,8 +208,6 @@ class OrganizationControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].role").doesNotExist());
     }
 
-    // ------------------------------------------------------------ membership
-
     @Test
     void addingAMemberIsIdempotent() throws Exception {
         UUID organization = createOrganization("IDEMPOTENT", "Idempotent");
@@ -259,8 +251,6 @@ class OrganizationControllerIntegrationTest {
         mockMvc.perform(put(path).with(as(plainUser()))).andExpect(status().isForbidden());
         mockMvc.perform(delete(path).with(as(reviewer()))).andExpect(status().isForbidden());
     }
-
-    // ------------------------------------------------------------ lifecycle
 
     @Test
     void archivingStopsFurtherMembershipButPermitsRemoval() throws Exception {
@@ -354,8 +344,6 @@ class OrganizationControllerIntegrationTest {
                 .andExpect(jsonPath("$.errors[0].field").value("code"))
                 .andExpect(jsonPath("$.errors[0].rejectedValue").doesNotExist());
     }
-
-    // ------------------------------------------------------------ /me
 
     @Test
     void meReportsTheCallersOrganizationsWithoutAnyRole() throws Exception {

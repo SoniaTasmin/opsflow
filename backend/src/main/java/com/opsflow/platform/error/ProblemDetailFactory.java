@@ -12,13 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Component;
 
-/**
- * Builds the single response shape every error in the system uses (RFC 9457).
- *
- * <p>Centralised so the contract cannot drift between handlers: every field that clients and
- * support rely on — {@code code}, {@code correlationId}, {@code timestamp} — is added in exactly
- * one place.
- */
+/** Builds the one RFC 9457 response shape, so the contract cannot drift between handlers. */
 @Component
 public class ProblemDetailFactory {
 
@@ -41,10 +35,6 @@ public class ProblemDetailFactory {
         return create(errorCode, errorCode.name(), detail, context, List.of());
     }
 
-    /**
-     * @param code the machine-readable code reported to the client. Usually the {@link ErrorCode}
-     *     constant name, but a {@link BusinessRuleException} supplies its own specific rule code.
-     */
     public ProblemDetail create(
             ErrorCode errorCode,
             String code,

@@ -7,20 +7,12 @@ import java.util.regex.Pattern;
 import org.slf4j.MDC;
 
 /**
- * The identifier that ties every log line, error response and background job belonging to one
- * logical operation together.
- *
- * <p>A client-supplied value is accepted so a caller can correlate across systems, but it is
- * validated first: the value is written into every log line for the request, so accepting an
- * arbitrary string would let a caller inject newlines into the log stream or bloat it without
- * bound.
+ * Ties every log line, error response and background job of one operation together. A
+ * client-supplied value is validated first: it reaches every log line for the request.
  */
 public record CorrelationId(String value) {
 
-    /**
-     * Permitted client-supplied form. Deliberately narrow: alphanumerics, hyphen and underscore
-     * only, which covers UUIDs and ULIDs while excluding anything that could break a log line.
-     */
+    // Narrow on purpose: covers UUIDs and ULIDs, excludes anything that could break a log line.
     private static final Pattern VALID = Pattern.compile("^[A-Za-z0-9_-]{8,64}$");
 
     public CorrelationId {
@@ -33,7 +25,6 @@ public record CorrelationId(String value) {
         return new CorrelationId(UUID.randomUUID().toString());
     }
 
-    /** Accepts a client-supplied value, falling back to a fresh one when absent or invalid. */
     public static CorrelationId acceptOrGenerate(String candidate) {
         if (candidate == null || !VALID.matcher(candidate).matches()) {
             return generate();
@@ -41,7 +32,6 @@ public record CorrelationId(String value) {
         return new CorrelationId(candidate);
     }
 
-    /** The correlation id for the current thread, if one has been established. */
     public static Optional<String> current() {
         return Optional.ofNullable(MDC.get(MdcKeys.CORRELATION_ID));
     }

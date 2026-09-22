@@ -21,13 +21,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * What happens to imports that a process death left behind.
- *
- * <p>An interrupted import is <strong>not</strong> resumed. Spring Batch can restart a job
- * instance, but nothing re-launches one on its own, and resuming from a half-applied chunk would
- * mean guessing what the previous process had committed. Instead the job is failed with its last
- * truthful counts and the user re-uploads, which is safe because applying the same values again
- * converges to the same state.
+ * An interrupted import is not resumed: resuming from a half-applied chunk means guessing what
+ * the dead process committed. It is failed with its last counts and the user re-uploads, which is
+ * safe because applying the same values again converges (ADR-0009).
  */
 @Component
 class ImportJobRecoveryService {

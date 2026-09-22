@@ -6,19 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Base type for every error the application raises deliberately.
- *
- * <p>The domain throws these and nothing else: no bare {@code IllegalArgumentException} for a
- * business rule, and no {@code ResponseStatusException} (which would put HTTP concerns in the
- * domain). Every instance carries an {@link ErrorCode}, so there is no free-text-only failure
- * that a client cannot react to programmatically.
- *
- * <p>The hierarchy is sealed: the set of error categories is a closed design decision, and
- * {@code GlobalExceptionHandler} maps all of them.
- *
- * <p>{@code context} carries structured detail for the problem response — identifiers, the
- * offending value, the states involved. It must never contain secrets or personal data,
- * because it is serialised to the client.
+ * The only failure type the domain throws. {@code context} is serialised to the client, so it
+ * must never carry secrets or personal data.
  */
 public abstract sealed class DomainException extends RuntimeException
         permits AccessDeniedDomainException,

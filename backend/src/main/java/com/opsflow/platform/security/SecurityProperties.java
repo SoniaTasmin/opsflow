@@ -7,14 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Security configuration, bound and validated at startup.
- *
- * <p>Nothing here has a permissive default. A missing audience or an empty CORS origin list must
- * fail startup loudly rather than quietly produce an application that accepts tokens meant for
- * something else, or requests from anywhere.
- *
- * @param audience the value this API requires in a token's {@code aud} claim
- * @param allowedOrigins exact origins permitted to call the API from a browser
+ * No permissive defaults: a missing audience or an empty origin list fails startup rather than
+ * quietly accepting tokens meant for something else, or requests from anywhere.
  */
 @ConfigurationProperties(prefix = "opsflow.security")
 @Validated

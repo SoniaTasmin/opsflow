@@ -33,9 +33,7 @@ class UuidV7Test {
 
     @Test
     void identifiersGeneratedOverTimeSortInGenerationOrder() {
-        // The whole reason for choosing v7 over v4: keys that sort by creation time
-        // keep B-tree inserts at the right edge of the index instead of scattering
-        // writes across it.
+        // The reason for v7 over v4: inserts stay at the right edge of the index.
         List<UUID> ids = new ArrayList<>();
         Instant start = Instant.parse("2026-01-01T00:00:00Z");
         IntStream.range(0, 50).forEach(i -> ids.add(UuidV7.generate(start.plusMillis(i))));

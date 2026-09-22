@@ -128,11 +128,7 @@ export class SubmissionFacade {
     }
   }
 
-  /**
-   * A stale version means someone else moved the submission while this screen was open. The
-   * only safe answer is to show them what is actually there -- retrying with the version they
-   * had would overwrite a change they have never seen.
-   */
+  /** Retrying with the version this screen held would overwrite a change nobody has seen. */
   private async reportAndReload(id: string, error: unknown): Promise<void> {
     this.report(error);
     if (error instanceof ApiError && (error.isVersionConflict || error.status === 409)) {

@@ -5,18 +5,10 @@ import { AbstractSecurityStorage } from 'angular-auth-oidc-client';
 const TOKEN_BEARING = /token|authzData|authnResult|userData/i;
 
 /**
- * Keeps tokens in memory while letting the authorization handshake survive the redirect.
- *
- * The library persists one JSON blob per config, mixing the handshake artifacts (state, nonce,
- * code verifier) with the tokens it later obtains. Those cannot share a lifetime: redirecting to
- * the identity provider tears the application down, so anything held only in memory is gone when
- * the callback arrives and the state can never be matched. Tokens, on the other hand, are
- * obtained *after* the redirect and must not be readable by script from browser storage.
- *
- * So the blob is split: the handshake half is written to sessionStorage, the token half is kept
- * in memory, and reads merge the two. A full page reload therefore loses the tokens and costs one
- * silent redirect through the still-valid SSO session, which is the price of keeping them out of
- * storage at all.
+ * The library stores one blob per config, mixing handshake artifacts with the tokens it later
+ * obtains. They cannot share a lifetime: the redirect tears the application down, so handshake
+ * state held only in memory is gone when the callback arrives, while tokens must not be readable
+ * by script. The blob is split, and a full page reload costs one silent redirect (ADR-0011).
  */
 @Injectable()
 export class InMemorySecurityStorage implements AbstractSecurityStorage {

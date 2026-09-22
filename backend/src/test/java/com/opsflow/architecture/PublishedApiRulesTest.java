@@ -33,8 +33,7 @@ class PublishedApiRulesTest {
 
     @Test
     void modulesTalkToEachOtherOnlyThroughTheirPublishedRootPackage() {
-        // Without this, the layered check still passes while another module reaches
-        // straight into an aggregate.
+        // Without this the layered check passes while a module reaches into an aggregate.
         for (String module : MODULES) {
             noClasses()
                     .that()
@@ -54,16 +53,14 @@ class PublishedApiRulesTest {
 
     @Test
     void publishedModuleApisUseTypedIdentifiersRatherThanRawUuids() {
-        // Every identifier here is a UUID underneath, so a raw one in a contract is a
-        // parameter the compiler cannot check. Unwrapping is legitimate at the persistence
-        // and JSON edges, which sit below this surface.
+        // Every identifier is a UUID underneath, so a raw one is a parameter the compiler
+        // cannot check. Unwrapping at the persistence and JSON edges is fine.
         for (String module : MODULES) {
             methods()
                     .that()
                     .areDeclaredInClassesThat()
                     .resideInAPackage("com.opsflow." + module)
                     .and()
-                    // The identifier types are the ones that legitimately wrap a UUID.
                     .areDeclaredInClassesThat()
                     .haveSimpleNameNotEndingWith("Id")
                     .and()

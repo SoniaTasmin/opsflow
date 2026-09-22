@@ -20,10 +20,7 @@ import java.util.Map;
 import org.springframework.batch.infrastructure.item.Chunk;
 import org.springframework.batch.infrastructure.item.ItemWriter;
 
-/**
- * Groups a chunk by organization and hands each group to the submission module. Efficiency comes
- * from the grouping; the aggregate is never bypassed.
- */
+/** Efficiency comes from grouping a chunk by organization; the aggregate is never bypassed. */
 class SubmissionApplyWriter implements ItemWriter<ParsedRow> {
 
     private final SubmissionImportService submissions;

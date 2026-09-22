@@ -8,21 +8,14 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * The real PostgreSQL every integration test runs against.
- *
- * <p>Deliberately not H2. H2 has no partial indexes, no exclusion constraints, different
- * {@code ON CONFLICT} semantics and no {@code jsonb} — all of which this schema depends on.
- * Testing against it would be testing a database we never run.
- *
- * <p>Spring caches application contexts by configuration, so declaring the container as a bean
- * here means one container is started once and shared by every test that imports this class,
- * rather than one per test class.
+ * Not H2: this schema depends on partial indexes, exclusion constraints and {@code ON CONFLICT}
+ * semantics it does not have. Declared as a bean so Spring's context cache starts one container
+ * for the whole suite rather than one per class.
  */
 @TestConfiguration(proxyBeanMethods = false)
 public class PostgresContainerConfig {
 
-    // Pinned to the same major version as production (see ADR-0007). A container
-    // that drifts ahead of the deployed database tests the wrong thing.
+    // Same major version as production (ADR-0007): a container that drifts tests the wrong thing.
     private static final DockerImageName IMAGE = DockerImageName.parse("postgres:18-alpine");
 
     @Bean

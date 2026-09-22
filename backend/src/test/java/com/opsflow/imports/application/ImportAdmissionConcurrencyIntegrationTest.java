@@ -176,8 +176,6 @@ class ImportAdmissionConcurrencyIntegrationTest {
         assertThat(((InMemoryImportFileStore) files).size()).isEqualTo(1);
     }
 
-    // ------------------------------------------------------------ helpers
-
     private UploadOutcome uploadAsReporter(String csv, String key) {
         return asReporter(() -> uploads.upload(new UploadImportCommand(
                 period,

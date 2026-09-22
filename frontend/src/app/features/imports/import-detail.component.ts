@@ -77,8 +77,7 @@ export class ImportDetailComponent {
 
   private async refresh(): Promise<void> {
     const job = await this.facade.loadDetail(this.id());
-    // Polling stops the moment the job reaches a terminal state: there is nothing left to
-    // learn, and a timer that never stops is a page that never goes idle.
+    // Stops at a terminal state: a timer that never stops is a page that never goes idle.
     if (job && (job.status === 'PENDING' || job.status === 'RUNNING')) {
       this.polling.set(true);
       this.timer = setTimeout(() => void this.refresh(), POLL_INTERVAL_MS);

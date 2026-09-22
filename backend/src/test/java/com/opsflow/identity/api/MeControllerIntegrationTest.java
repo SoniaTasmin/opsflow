@@ -38,9 +38,7 @@ class MeControllerIntegrationTest {
 
     private static final String ISSUER = "https://issuer.example/realms/opsflow";
 
-    // The whole filter chain, exactly as it is assembled at runtime. That matters here:
-    // whether a 401 carries a correlation id depends on the correlation filter running
-    // before Spring Security's, which only the real chain demonstrates.
+    // The real filter chain: whether a 401 carries a correlation id depends on filter order.
     @Autowired
     private MockMvc mockMvc;
 

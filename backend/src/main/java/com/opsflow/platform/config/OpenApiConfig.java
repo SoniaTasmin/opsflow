@@ -7,15 +7,7 @@ import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * OpenAPI document metadata.
- *
- * <p>The generated document is not just documentation: the Angular client is generated from it,
- * and CI fails when the committed client and the live spec disagree. That makes the spec a
- * build-enforced contract rather than a description that drifts.
- *
- * <p>Security schemes are added with the resource server in M2.
- */
+/** The Angular client is generated from this document and CI fails on drift, so it is a contract. */
 @Configuration(proxyBeanMethods = false)
 public class OpenApiConfig {
 

@@ -31,22 +31,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Verifies the error contract as a client actually experiences it: status, media type, and the
- * exact JSON shape.
- *
- * <p>Driven through a test-only controller rather than a real endpoint, so the contract is
- * pinned down before any feature depends on it and the test does not break when features change.
- */
+/** The error contract as a client experiences it, driven through a test-only controller. */
 class ErrorContractControllerTest {
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        // No application context: this verifies exception-to-HTTP mapping, which needs a
-        // controller, the advice and the correlation filter, and nothing else. Standalone
-        // setup keeps it fast and stops unrelated configuration from breaking it.
+        // No application context: exception-to-HTTP mapping needs the advice and the filter
+        // and nothing else.
         mockMvc = MockMvcBuilders.standaloneSetup(new TestController())
                 .setControllerAdvice(new GlobalExceptionHandler(new ProblemDetailFactory(Clock.systemUTC())))
                 .addFilters(new CorrelationIdFilter())
@@ -85,15 +78,13 @@ class ErrorContractControllerTest {
 
     @Test
     void errorContextCannotOverwriteAReservedProblemField() throws Exception {
-        // An exception's context map is supplied by whoever threw it. A key like "code"
-        // would otherwise overwrite the machine-readable error code with an unrelated
-        // value - silently, and only for the exceptions that happen to carry that key.
+        // Context is supplied by whoever threw: a key like "code" would otherwise overwrite the
+        // machine-readable code, silently and only for the exceptions carrying it.
         mockMvc.perform(get("/__test/hostile-context"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("VERSION_CONFLICT"))
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.title").value("Version conflict"))
-                // A non-reserved key is still carried through.
                 .andExpect(jsonPath("$.organizationCode").value("BERLIN_OPS"));
     }
 
@@ -113,16 +104,12 @@ class ErrorContractControllerTest {
                 .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.errors", hasSize(2)))
                 .andExpect(jsonPath("$.errors[*].field", containsInAnyOrder("name", "amount")))
-                // The generic handler never echoes what was submitted.
                 .andExpect(jsonPath("$.errors[*].rejectedValue").doesNotExist());
     }
 
     @Test
     void aRejectedStringValueIsNotReflectedIntoTheResponse() throws Exception {
-        // The generic validation handler sees every request body in the application,
-        // including ones carrying credentials or personal data, and cannot tell which
-        // field is which. Reflecting a submitted value would put it in the response body
-        // and in anything that records responses.
+        // The generic handler sees every request body, including ones carrying credentials.
         String secretish = "super-secret-value-that-must-not-come-back";
 
         String body = mockMvc.perform(post("/__test/validate")
@@ -161,7 +148,6 @@ class ErrorContractControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
                 .andExpect(jsonPath("$.correlationId").value(notNullValue()))
-                // No stack trace, no exception class name, no internal message.
                 .andExpect(jsonPath("$.detail").value("An unexpected error occurred"))
                 .andExpect(jsonPath("$.trace").doesNotExist())
                 .andExpect(jsonPath("$.exception").doesNotExist());

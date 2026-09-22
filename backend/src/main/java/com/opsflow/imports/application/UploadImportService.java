@@ -31,9 +31,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 
 /**
- * Admission: the only place an import's authority is decided, and the only place a real token is
- * available to decide it with. What it records is the basis for that decision, never the roles
- * themselves.
+ * Admission is the only place a real token is available, so it is the only place authority is
+ * decided. It records the basis for that decision, never the roles.
  */
 @Service
 @EnableConfigurationProperties(ImportProperties.class)
@@ -141,9 +140,8 @@ public class UploadImportService {
     }
 
     /**
-     * The same key with the same request is the same import, so it is handed back rather than
-     * run again. Any difference is a conflict: silently returning the first file's job would
-     * leave the caller believing the second one had been applied.
+     * Any difference is a conflict: returning the first file's job would leave the caller
+     * believing the second had been applied.
      */
     private UploadOutcome replay(ImportJob existing, String fingerprint, StoredFile stored) {
         files.delete(stored.ref());
@@ -234,7 +232,7 @@ public class UploadImportService {
         }
     }
 
-    /** Kept as a label, never as a path element; control characters would corrupt a log line. */
+    /** A label, never a path element; control characters would corrupt a log line. */
     private static String sanitize(String filename) {
         if (filename == null || filename.isBlank()) {
             return "upload.csv";

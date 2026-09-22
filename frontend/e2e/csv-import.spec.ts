@@ -2,10 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { dialogButton, fillField, findRow, navigateTo, selectOption, signIn } from './app';
 
-/**
- * CSV import end to end: an administrator prepares a period, a reporter uploads a file with one
- * good row and two bad ones, and the screen reports exactly what was applied and what was not.
- */
+/** A file with one good row and two bad ones, and the screen reporting exactly that. */
 
 const RUN = Date.now().toString().slice(-6);
 const ORG_CODE = `IMP${RUN}`;

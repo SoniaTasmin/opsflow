@@ -29,11 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Every state change a submission can undergo.
- *
- * <p>The aggregate owns the state machine and the values; this owns the rules that need another
- * aggregate — the period being open, the organization participating — and the organization-scoped
- * authorization that cannot be decided until the submission has been read.
+ * Owns the rules needing another aggregate and the organization-scoped authorization, which
+ * cannot be decided until the submission has been read. The state machine is the aggregate's.
  */
 @Service
 @EnableConfigurationProperties(WorkflowProperties.class)
@@ -101,8 +98,8 @@ public class SubmissionCommandService {
                 id, expectedVersion, (actor, submission) -> submission.withdraw(actor.userId(), Instant.now(clock)));
     }
 
-    // A review may be finished after the period closes -- the deadline governs authors, not
-    // reviewers, and a closed period must not leave work stuck in the queue forever.
+    // Review may finish after the period closes: the deadline governs authors, and a closed
+    // period must not strand work in the queue.
     @Transactional
     public SubmissionView claim(SubmissionId id, long expectedVersion) {
         return reviewing(

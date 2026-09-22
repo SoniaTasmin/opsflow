@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
 
-/** Persistence shape of {@code opsflow.org_membership}. Deliberately has no role column. */
+/** Persistence shape of {@code opsflow.org_membership}. No role column: membership carries none. */
 @Entity
 @Table(name = "org_membership", schema = "opsflow")
 public class OrgMembershipEntity {

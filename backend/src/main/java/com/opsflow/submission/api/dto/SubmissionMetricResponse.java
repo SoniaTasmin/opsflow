@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-/** A metric the submission is expected to report, carrying everything its input needs. */
 public record SubmissionMetricResponse(
         @Schema(requiredMode = RequiredMode.REQUIRED) UUID metricId,
         @Schema(requiredMode = RequiredMode.REQUIRED) String code,

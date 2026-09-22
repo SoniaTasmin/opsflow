@@ -29,16 +29,9 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * The one test that exercises authentication against a real Keycloak.
- *
- * <p>Everything else uses {@code jwt()} post-processors, which are orders of magnitude faster but
- * bypass token validation entirely. This test is what proves the parts they cannot: that the
- * committed realm actually imports, that its audience mapper puts {@code opsflow-api} in the
- * token, that a genuinely signed token passes signature and issuer validation, that realm roles
- * arrive as application roles, and that a first-time login provisions a local user.
- *
- * <p>It runs against the same {@code realm-opsflow.json} the local stack uses, so a change that
- * breaks the realm breaks the build rather than someone's morning.
+ * The one test that uses a real Keycloak. Everything else uses {@code jwt()} post-processors,
+ * which are far faster but bypass token validation entirely, so only this proves the committed
+ * realm imports, its audience mapper fires, and a genuinely signed token is accepted.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(PostgresContainerConfig.class)
@@ -78,9 +71,8 @@ class KeycloakAuthenticationIntegrationTest {
         registry.add(
                 "spring.security.oauth2.resourceserver.jwt.issuer-uri",
                 KeycloakAuthenticationIntegrationTest::issuerUri);
-        // Must be overridden too: application.yml sets a default pointing at the local
-        // Compose stack, and leaving it would have this test verifying signatures against
-        // whatever Keycloak happened to be running on the developer's machine.
+        // Overridden too: the default points at the local Compose stack, which would have this
+        // verifying signatures against whatever Keycloak the developer happens to be running.
         registry.add(
                 "spring.security.oauth2.resourceserver.jwt.jwk-set-uri",
                 () -> issuerUri() + "/protocol/openid-connect/certs");
@@ -92,7 +84,6 @@ class KeycloakAuthenticationIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    /** Obtains a genuine token the way a developer would, via the local-only dev client. */
     private String tokenFor(String username) throws Exception {
         return tokenFor(username, "opsflow-dev-cli");
     }
@@ -171,8 +162,7 @@ class KeycloakAuthenticationIntegrationTest {
     @Test
     @DisplayName("the realm's audience mapper puts this API in the token")
     void theRealmIssuesTokensForThisApi() throws Exception {
-        // If the audience mapper is ever removed from the realm, every token silently
-        // stops being valid for this API. Asserting it here makes that a build failure.
+        // Removing the realm's audience mapper would silently invalidate every token here.
         JsonNode claims = claimsOf(tokenFor("reporter"));
 
         assertThat(claims.get("aud").toString()).contains("opsflow-api");
@@ -182,10 +172,7 @@ class KeycloakAuthenticationIntegrationTest {
     @Test
     @DisplayName("a validly signed token issued for a different client is rejected")
     void aTokenWithoutThisApisAudienceIsRejected() throws Exception {
-        // Correctly signed, from the right issuer, not expired - and still not ours.
-        // Signature and issuer checks prove a token is genuine, never that it was meant
-        // for this API; without the audience check, any token from the realm would work
-        // here, including one a user consented to give an entirely different application.
+        // Correctly signed, right issuer, not expired - and still not meant for this API.
         String otherClientToken = tokenFor("reporter", "opsflow-wrong-audience-cli");
         JsonNode audience = claimsOf(otherClientToken).get("aud");
         assertThat(audience == null ? "" : audience.toString()).doesNotContain("opsflow-api");

@@ -5,12 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Published lookup of users by identifier, for modules that need to render who did something.
- *
- * <p>{@link #findAllById(Set)} exists so a caller rendering a list resolves every name in one
- * query rather than one per row.
- */
+/** {@link #findAllById(Set)} exists so a caller rendering a list resolves names in one query. */
 public interface UserDirectory {
 
     Optional<UserSummary> findById(UserId userId);

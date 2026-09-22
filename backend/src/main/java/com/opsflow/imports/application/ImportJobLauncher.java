@@ -17,11 +17,8 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.stereotype.Component;
 
 /**
- * Runs imports off the request thread, on a bounded pool.
- *
- * <p>The queue lives in this JVM, not on disk: a job that is enqueued but never started is
- * recovered from its PENDING row after a restart, which is what makes that row the record of
- * truth rather than this executor.
+ * The queue lives in this JVM, not on disk: a job enqueued but never started is recovered from
+ * its PENDING row, which is the record of truth rather than this executor.
  */
 @Component
 public class ImportJobLauncher {
@@ -59,10 +56,7 @@ public class ImportJobLauncher {
         }
     }
 
-    /**
-     * Lets the running chunk finish on a normal shutdown. Anything still queued stays PENDING and
-     * is picked up by recovery; nothing is silently dropped.
-     */
+    /** Lets the running chunk finish; anything still queued stays PENDING for recovery. */
     @PreDestroy
     void shutdown() {
         executor.shutdown();

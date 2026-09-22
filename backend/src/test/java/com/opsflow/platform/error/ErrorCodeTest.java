@@ -30,9 +30,8 @@ class ErrorCodeTest {
     @ParameterizedTest
     @EnumSource(ErrorCode.class)
     void typeUriIsAUrnRatherThanAnUnservedHttpUrl(ErrorCode code) {
-        // RFC 9457 does not require the type URI to be dereferenceable, and an https URI
-        // for a domain the project neither owns nor serves would be a promise it cannot
-        // keep. `code` is the machine contract; this only identifies the problem kind.
+        // RFC 9457 does not require the type to resolve, and an https URI the project does not
+        // serve would be a promise it cannot keep.
         assertThat(code.typeUri()).doesNotStartWith("http");
     }
 

@@ -28,9 +28,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Imported values take the same route as typed ones: the same aggregate, the same validation
- * policy, the same optimistic locking. The only thing an import changes is how the work is
- * grouped, which is why this takes a whole organization's values at once.
+ * Imported values take the route typed ones take. Only the grouping differs, which is why this
+ * takes a whole organization's values at once.
  */
 @Service
 class SubmissionImportApplicationService implements SubmissionImportService {
@@ -54,10 +53,7 @@ class SubmissionImportApplicationService implements SubmissionImportService {
         this.clock = clock;
     }
 
-    /**
-     * Joins the caller's transaction rather than opening its own, so a chunk rollback undoes the
-     * aggregate saves it made and a chunk retry starts from a clean slate.
-     */
+    /** Joins the chunk transaction, so a chunk rollback undoes the aggregate saves it made. */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public ApplyValuesResult applyValues(ApplyValuesCommand command) {

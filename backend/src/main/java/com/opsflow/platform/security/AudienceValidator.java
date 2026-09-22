@@ -7,12 +7,8 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
- * Requires that a token was actually issued for this API.
- *
- * <p>Without this check, any validly-signed token from the same realm is accepted — including one
- * a user consented to give a completely different client. Signature and issuer validation alone
- * prove the token is genuine, not that it was meant for us; that is the audience-confusion
- * problem, and it is why the {@code aud} claim exists.
+ * Signature and issuer prove a token is genuine, not that it was meant for us. Without this, a
+ * token a user consented to give another client of the same realm is accepted here.
  */
 class AudienceValidator implements OAuth2TokenValidator<Jwt> {
 

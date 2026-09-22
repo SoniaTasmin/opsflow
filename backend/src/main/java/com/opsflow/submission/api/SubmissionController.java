@@ -159,11 +159,7 @@ public class SubmissionController {
         return respond(commands.reject(SubmissionId.of(id), request.reason(), request.version()));
     }
 
-    /**
-     * Commands answer with the whole submission rather than an acknowledgement: every one of
-     * them changes what the detail screen may show next, and a client that has to re-fetch to
-     * find out is a client that renders a stale version number into its next request.
-     */
+    /** Commands answer with the whole submission: a client that re-fetches sends a stale version. */
     private SubmissionDetailResponse respond(SubmissionView view) {
         return SubmissionDetailResponse.from(queries.detail(view.id()));
     }

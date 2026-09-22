@@ -21,12 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Spans three modules — the period's frozen participants, the caller's memberships and the
- * submissions themselves — so it lives in the composition layer rather than making any of them
- * depend on another's internals.
- *
- * <p>Two published calls and no joins: the participant set comes from reporting, the counts come
- * from submission for exactly that set, and NOT_STARTED is the difference between them.
+ * Spans three modules, so it composes rather than making any of them depend on another's
+ * internals: two published calls and no joins, with NOT_STARTED the difference between them.
  */
 @Service
 public class PeriodSummaryService {
@@ -65,8 +61,7 @@ public class PeriodSummaryService {
             byStatus.put(SummaryStatus.of(entry.getKey()), entry.getValue());
             withSubmissions += entry.getValue();
         }
-        // A participant with no submission row has not started. Every submission belongs to a
-        // participant, so this can never go negative.
+        // Every submission belongs to a participant, so this can never go negative.
         byStatus.put(SummaryStatus.NOT_STARTED, participants.size() - withSubmissions);
 
         int approved = byStatus.get(SummaryStatus.APPROVED);
@@ -82,10 +77,7 @@ public class PeriodSummaryService {
                 completion);
     }
 
-    /**
-     * The frozen participant set, narrowed by membership for a caller who may not see everything.
-     * Narrowing the denominator as well as the counts is what keeps them reconcilable.
-     */
+    /** Narrowing the denominator as well as the counts is what keeps them reconcilable. */
     private Set<OrganizationId> visibleParticipants(PeriodId periodId, Actor actor, boolean seesEverything) {
         Set<OrganizationId> participants = periods.participantsOf(periodId);
         if (seesEverything) {
