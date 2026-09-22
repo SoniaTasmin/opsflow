@@ -8,6 +8,7 @@ SHELL := /bin/bash
 
 COMPOSE := docker compose
 GRADLEW := ./gradlew
+API_URL := http://localhost:8080
 
 .PHONY: help
 help: ## Show available targets
@@ -79,7 +80,21 @@ build: ## Build both projects
 	cd frontend && npm run build
 
 .PHONY: demo
-demo: ## Full demo stack with seed data
-	@echo "Not available yet: the demo stack lands at M9."
-	@echo "For now: 'make up' starts PostgreSQL and the app runs from your IDE."
-	@exit 1
+demo: ## Seed the demo dataset (needs 'make up' plus a running backend)
+	@command -v node >/dev/null 2>&1 || { echo "node is required to seed the demo data"; exit 1; }
+	@curl -fsS $(API_URL)/actuator/health >/dev/null 2>&1 || { \
+		echo "The backend is not answering on $(API_URL)."; \
+		echo "Start it first: cd backend && ./gradlew bootRun"; exit 1; }
+	node deploy/demo/seed.mjs
+
+.PHONY: demo-reset
+demo-reset: ## DESTROYS local data, then restarts the stack empty and ready to reseed
+	@echo "This deletes the local PostgreSQL volume: every organization, submission and import."
+	@echo "Keycloak users come back from the realm import; application data does not."
+	@printf "Type 'yes' to continue: " && read answer && [ "$$answer" = "yes" ]
+	$(COMPOSE) down -v
+	$(MAKE) up
+	@echo "Empty. Restart the backend, then run 'make demo'."
+
+.PHONY: verify
+verify: lint test build ## Everything CI runs, in one command
