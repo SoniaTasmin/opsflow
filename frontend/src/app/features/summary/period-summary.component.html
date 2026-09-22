@@ -1,0 +1,80 @@
+<app-page-header title="Period summary" subtitle="How far through a reporting period we are">
+  <button matButton data-action="refresh" [disabled]="!selectedPeriodId()" (click)="reload()">
+    <mat-icon>refresh</mat-icon>
+    Refresh
+  </button>
+</app-page-header>
+
+<mat-form-field appearance="outline" class="period-picker">
+  <mat-label>Reporting period</mat-label>
+  <mat-select
+    [ngModel]="selectedPeriodId()"
+    (ngModelChange)="choose($event)"
+    data-testid="period-picker"
+  >
+    @for (period of facade.periods(); track period.id) {
+      <mat-option [value]="period.id">{{ period.code }} ({{ period.status }})</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+
+@if (facade.loading() && !summary()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (facade.failed()) {
+  <app-empty-state icon="error_outline" message="The summary could not be loaded.">
+    <button matButton="filled" data-action="retry" (click)="reload()">Try again</button>
+  </app-empty-state>
+} @else if (summary(); as figures) {
+  <div class="headline" data-testid="summary">
+    <app-status-chip [status]="figures.periodStatus" />
+    <span class="code">{{ figures.periodCode }}</span>
+    <span class="scope" data-testid="scope">
+      {{ scopedToMine() ? 'Your organizations' : 'All participating organizations' }}
+    </span>
+  </div>
+
+  @if (nobodyReports()) {
+    <app-empty-state
+      icon="group_off"
+      [message]="
+        scopedToMine()
+          ? 'None of your organizations report in this period.'
+          : 'This period has no participating organizations.'
+      "
+    />
+  } @else {
+    <mat-card appearance="outlined" class="completion">
+      <mat-card-content>
+        <div class="completion-line">
+          <span class="label">Approved</span>
+          <span class="value" data-testid="completion">
+            {{ figures.completionRatio | percent: '1.0-0' }}
+          </span>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="figures.completionRatio * 100" />
+        <p class="denominator" data-testid="participants">
+          {{ figures.approved | number }} of
+          {{ figures.participatingOrganizations | number }} participating organizations
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="tiles">
+      @for (tile of tiles(); track tile.label) {
+        <mat-card appearance="outlined" [attr.data-status]="tile.label">
+          <mat-card-content>
+            <span class="label">{{ tile.label }}</span>
+            <span class="count" [class]="'count--' + tile.tone">{{ tile.count | number }}</span>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <p class="reconciles">
+      Counted against the organizations frozen into this period when it opened, so the figures do
+      not move when organizations are later added or archived.
+    </p>
+  }
+}

@@ -31,7 +31,10 @@ class CrossModuleSqlRulesTest {
                             "reporting_period",
                             "reporting_period_metric",
                             "reporting_period_organization"),
-            "submission", List.of("submission", "submission_value", "submission_transition"));
+            "submission", List.of("submission", "submission_value", "submission_transition"),
+            "imports", List.of("import_job", "import_row_error"),
+            // Owns no table of its own: composition reads through published ports only.
+            "composition", List.of());
 
     @Test
     void noModuleQueriesAnotherModulesTables() throws IOException {

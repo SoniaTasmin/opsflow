@@ -30,6 +30,8 @@ import { PeriodDetailResponse } from '../model/period-detail-response';
 // @ts-ignore
 import { PeriodResponse } from '../model/period-response';
 // @ts-ignore
+import { PeriodSummaryResponse } from '../model/period-summary-response';
+// @ts-ignore
 import { ReschedulePeriodRequest } from '../model/reschedule-period-request';
 // @ts-ignore
 import { SetMetricScopeRequest } from '../model/set-metric-scope-request';
@@ -343,6 +345,97 @@ export class ReportingPeriodsService
     let localVarPath = `/api/v1/periods/${this.configuration.encodeParam({ name: 'id', value: id, in: 'path', style: 'simple', explode: false, dataType: 'string', dataFormat: 'uuid' })}`;
     const { basePath, withCredentials } = this.configuration;
     return this.httpClient.request<PeriodDetailResponse>('get', `${basePath}${localVarPath}`, {
+      context: localVarHttpContext,
+      responseType: <any>responseType_,
+      ...(withCredentials ? { withCredentials } : {}),
+      headers: localVarHeaders,
+      observe: observe,
+      ...(localVarTransferCache !== undefined ? { transferCache: localVarTransferCache } : {}),
+      reportProgress: reportProgress,
+    });
+  }
+
+  /**
+   * How far through a reporting period its participants are
+   * Counted against the period\&#39;s frozen participant set. Reviewers and administrators see every participant; everyone else sees their own organizations, denominator included.
+   * @endpoint get /api/v1/periods/{periodId}/summary
+   * @param periodId
+   * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+   * @param reportProgress flag to report request and response progress.
+   * @param options additional options
+   */
+  public getPeriodSummary(
+    periodId: string,
+    observe?: 'body',
+    reportProgress?: boolean,
+    options?: {
+      httpHeaderAccept?: 'application/json';
+      context?: HttpContext;
+      transferCache?: boolean;
+    },
+  ): Observable<PeriodSummaryResponse>;
+  public getPeriodSummary(
+    periodId: string,
+    observe?: 'response',
+    reportProgress?: boolean,
+    options?: {
+      httpHeaderAccept?: 'application/json';
+      context?: HttpContext;
+      transferCache?: boolean;
+    },
+  ): Observable<HttpResponse<PeriodSummaryResponse>>;
+  public getPeriodSummary(
+    periodId: string,
+    observe?: 'events',
+    reportProgress?: boolean,
+    options?: {
+      httpHeaderAccept?: 'application/json';
+      context?: HttpContext;
+      transferCache?: boolean;
+    },
+  ): Observable<HttpEvent<PeriodSummaryResponse>>;
+  public getPeriodSummary(
+    periodId: string,
+    observe: any = 'body',
+    reportProgress: boolean = false,
+    options?: {
+      httpHeaderAccept?: 'application/json';
+      context?: HttpContext;
+      transferCache?: boolean;
+    },
+  ): Observable<any> {
+    if (periodId === null || periodId === undefined) {
+      throw new Error(
+        'Required parameter periodId was null or undefined when calling getPeriodSummary.',
+      );
+    }
+
+    let localVarHeaders = this.defaultHeaders;
+
+    const localVarHttpHeaderAcceptSelected: string | undefined =
+      options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept(['application/json']);
+    if (localVarHttpHeaderAcceptSelected !== undefined) {
+      localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+    }
+
+    const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+    const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+    let responseType_: 'text' | 'json' | 'blob' = 'json';
+    if (localVarHttpHeaderAcceptSelected) {
+      if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+        responseType_ = 'text';
+      } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+        responseType_ = 'json';
+      } else {
+        responseType_ = 'blob';
+      }
+    }
+
+    let localVarPath = `/api/v1/periods/${this.configuration.encodeParam({ name: 'periodId', value: periodId, in: 'path', style: 'simple', explode: false, dataType: 'string', dataFormat: 'uuid' })}/summary`;
+    const { basePath, withCredentials } = this.configuration;
+    return this.httpClient.request<PeriodSummaryResponse>('get', `${basePath}${localVarPath}`, {
       context: localVarHttpContext,
       responseType: <any>responseType_,
       ...(withCredentials ? { withCredentials } : {}),

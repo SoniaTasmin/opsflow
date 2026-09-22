@@ -22,9 +22,11 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -241,6 +243,35 @@ class JpaSubmissionRepository implements SubmissionRepository {
                         rs.getString("reason"),
                         toInstant(rs.getObject("occurred_at", OffsetDateTime.class))))
                 .list();
+    }
+
+    /**
+     * One grouped query for the whole set: the caller's denominator can be hundreds of
+     * organizations, and asking per organization is how a summary screen becomes a load test.
+     */
+    @Override
+    public Map<SubmissionStatus, Integer> countByStatus(
+            PeriodId reportingPeriodId, Set<OrganizationId> organizationIds) {
+        if (organizationIds.isEmpty()) {
+            return Map.of();
+        }
+        UUID[] organizations =
+                organizationIds.stream().map(OrganizationId::value).toArray(UUID[]::new);
+
+        Map<SubmissionStatus, Integer> counts = new EnumMap<>(SubmissionStatus.class);
+        jdbc.sql(
+                        """
+                SELECT status, count(*) AS total
+                  FROM opsflow.submission
+                 WHERE reporting_period_id = :periodId
+                   AND organization_id = ANY (:organizations)
+                 GROUP BY status
+                """)
+                .param("periodId", reportingPeriodId.value())
+                .param("organizations", organizations)
+                .query((rs, rowNum) -> counts.put(SubmissionStatus.valueOf(rs.getString("status")), rs.getInt("total")))
+                .list();
+        return counts;
     }
 
     private void syncValues(Submission submission, UserId actor) {

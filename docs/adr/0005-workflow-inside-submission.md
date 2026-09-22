@@ -46,3 +46,12 @@ The summary reads the frozen participant set through `PeriodQuery.participantsOf
 This ADR anticipated `submission.domain.review` and `submission.application.review` sub-packages. They were not created: the review commands — `claim`, `release`, `approve`, `reject` — turn out to be state transitions on the `Submission` aggregate itself, and splitting a state machine across packages would hide it rather than separate it. The module's `application` layer holds two services, `SubmissionCommandService` and `SubmissionQueryService`, and needs no third level of packaging yet.
 
 The split that did prove necessary is a different one: the aggregate owns the state machine, the values and the transition log, while the application service owns the rules that need another aggregate — the period being open, the organization participating in it — and the organization-scoped authorization that cannot be decided until the submission has been read.
+
+
+## Amendment (M8, implemented)
+
+This ADR placed the period summary inside `submission`, on the grounds that it is a read model over submission rows. M8 moved it to the **composition layer** instead.
+
+The reason is the denominator. The summary counts a period's *frozen participants*, which `reporting` owns, narrowed by the caller's *memberships*, which `organization` owns, against *submission statuses*. Putting it in `submission` would have made the module that owns the least of that composition the one that orchestrates it, and `submission` sits above `organization` in the module order only by accident of the chain, not because it should be asking it questions.
+
+So `submission` publishes the smallest read contract the summary needs — `SubmissionQuery.countByStatus(periodId, organizationIds)`, one grouped query for a whole set — and `PeriodSummaryService` in `composition` combines it with `PeriodQuery.participantsOf`. The rule the original decision protected is intact and is still the point: no module reads another's tables, and NOT_STARTED remains a set difference computed in application code rather than a join.

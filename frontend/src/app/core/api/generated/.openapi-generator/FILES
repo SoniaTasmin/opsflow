@@ -44,6 +44,7 @@ model/page-response-user-response.ts
 model/participant-response.ts
 model/period-detail-response.ts
 model/period-response.ts
+model/period-summary-response.ts
 model/reject-submission-request.ts
 model/reschedule-period-request.ts
 model/save-values-request.ts

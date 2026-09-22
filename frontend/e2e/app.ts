@@ -4,6 +4,7 @@ import { Browser, Locator, Page, expect } from '@playwright/test';
 
 export const NAV: Record<string, string> = {
   Home: '/home',
+  'Period summary': '/summary',
   Organizations: '/admin/organizations',
   Metrics: '/admin/metrics',
   'Reporting periods': '/admin/periods',
@@ -41,6 +42,19 @@ export async function fillField(page: Page, label: string, value: string): Promi
 
 export function dialogButton(page: Page, name: string): Locator {
   return page.getByRole('dialog').getByRole('button', { name, exact: true });
+}
+
+/**
+ * Admin lists are paginated and ordered by code, so a freshly created row is not necessarily on
+ * the first page once a database has some history. Search for it rather than assuming.
+ */
+export async function findRow(page: Page, code: string): Promise<Locator> {
+  // The label is shared with the search button beside the field, and the search runs on Enter.
+  await page.getByPlaceholder('Code or name').fill(code);
+  await page.getByPlaceholder('Code or name').press('Enter');
+  const row = page.getByRole('row', { name: new RegExp(code) });
+  await expect(row).toBeVisible();
+  return row;
 }
 
 export async function selectOption(page: Page, label: string, option: RegExp): Promise<void> {
