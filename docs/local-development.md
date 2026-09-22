@@ -101,6 +101,17 @@ Run the backend with the `local` Spring profile, and the frontend with `npm star
 `make down` stops the stack and keeps your data. `make clean` deletes the data volume and all
 build output.
 
+## Demo data
+
+```bash
+make demo          # seeds through the running application's own API
+make demo-reset    # DELETES the local database volume, then restarts empty
+```
+
+The seeder (`deploy/demo/seed.mjs`) signs in as the demo users and creates everything through
+`/api/v1` — no direct inserts — so the dataset is by construction data the application accepts.
+It refuses to run twice; reset first. [`docs/demo.md`](demo.md) is the walkthrough.
+
 ## Configuration
 
 `make up` copies `.env.example` to `.env` on first run. `.env` is git-ignored and must never be

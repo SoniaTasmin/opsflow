@@ -1,0 +1,9 @@
+organization_code,metric_code,value,note
+OSLO_OPS,REVENUE,455900.00,this row is valid and is applied
+ATLANTIS_OPS,HEADCOUNT,10,no organization has this code
+OSLO_OPS,NOT_A_METRIC,5,this period does not collect that metric
+OSLO_OPS,OPEN_TICKETS,many,not a number
+OSLO_OPS,SLA_COMPLIANCE,142,a percentage cannot exceed 100 whatever the metric declares
+BERLIN_OPS,HEADCOUNT,999,that submission is already approved
+OSLO_OPS,HEADCOUNT,64,
+OSLO_OPS,HEADCOUNT,65,a second value for one metric: the last wins and the earlier row is reported

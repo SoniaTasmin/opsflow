@@ -48,6 +48,10 @@ class SubmissionApplyWriter implements ItemWriter<ParsedRow> {
         this.correlationId = correlationId;
     }
 
+    private static String skipped(int rows) {
+        return rows == 1 ? " (1 row skipped)" : " (" + rows + " rows skipped)";
+    }
+
     @Override
     public void write(Chunk<? extends ParsedRow> chunk) {
         List<ImportRowError> errors = new ArrayList<>();
@@ -91,7 +95,7 @@ class SubmissionApplyWriter implements ItemWriter<ParsedRow> {
                 errors.add(new ImportRowError(
                         rows.getFirst().rowNumber(),
                         result.groupRejection().code(),
-                        result.groupRejection().message() + " (" + rows.size() + " rows skipped)",
+                        result.groupRejection().message() + skipped(rows.size()),
                         rows.size()));
                 invalid += rows.size();
                 continue;
