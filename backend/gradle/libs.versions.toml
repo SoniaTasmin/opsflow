@@ -15,7 +15,7 @@ springDependencyManagement = "1.1.7"
 springdoc = "3.1.1"
 
 # --- Build plugins --------------------------------------------------------
-spotless = "7.0.4"
+spotless = "8.10.2"
 palantirJavaFormat = "2.68.0"
 
 # --- Test -----------------------------------------------------------------
