@@ -26,7 +26,7 @@ palantirJavaFormat = "2.68.0"
 # (@AnalyzeClasses) is built against the JUnit Platform 1.x API and has not been
 # verified against Platform 6. Plain Jupiter tests that invoke ArchRule.check()
 # directly give identical coverage with no compatibility exposure.
-archunit = "1.4.1"
+archunit = "1.5.1"
 
 # Spring Boot 4's BOM does not manage Testcontainers coordinates, so its own BOM
 # is imported explicitly to keep every module on one version.
