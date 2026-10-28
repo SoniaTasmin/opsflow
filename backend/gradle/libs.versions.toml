@@ -12,7 +12,7 @@ springDependencyManagement = "1.1.7"
 
 # --- API documentation ----------------------------------------------------
 # springdoc majors track Spring Boot majors; the 3.x line is the Boot 4 line.
-springdoc = "3.1.1"
+springdoc = "3.2.0"
 
 # --- Build plugins --------------------------------------------------------
 spotless = "7.0.4"
