@@ -7,7 +7,7 @@
 # --- Spring ---------------------------------------------------------------
 # Spring Boot 3.x reached end of OSS support on 2026-06-30 (final patch 3.5.16),
 # so the 3.x line is not an option. 4.1.1 is the current GA.
-springBoot = "4.1.1"
+springBoot = "4.1.2"
 springDependencyManagement = "1.1.7"
 
 # --- API documentation ----------------------------------------------------
